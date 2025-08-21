@@ -1,0 +1,60 @@
+# Development files
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local configuration
+.env
+.env.local
+.env.production
+config/local.env
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Frontend build artifacts (will be built during deployment)
+frontend/
+static/
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Deployment scripts
+deploy-*.sh
+deploy-*.ps1
+*.service
+nginx-*.conf
+PRODUCTION_*.md
