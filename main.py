@@ -1,0 +1,387 @@
+"""
+XSEMA - Main Application Entry Point
+
+This is the main FastAPI application for XSEMA.
+It provides real-time NFT analytics, security analysis, and portfolio management.
+"""
+import logging
+import sys
+import time
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+import uvicorn
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
+import json
+import uuid
+import traceback
+from typing import Optional
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler("server.log")
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Application metadata
+APP_TITLE = "XSEMA"
+APP_DESCRIPTION = """
+# XSEMA - Advanced NFT Security & Analytics Platform
+
+A comprehensive platform for NFT analytics, security analysis, and portfolio management.
+
+## Key Features
+
+- **🔒 Security Analysis**: Advanced wallet clustering, wash trading detection, and anomaly detection
+- **📊 Portfolio Management**: Track and analyze NFT portfolios across multiple wallets
+- **🔍 Market Analytics**: Real-time market data, trends, and insights
+- **🎯 Trait Analysis**: Comprehensive rarity scoring and trait statistics
+- **⚡ Real-time Updates**: WebSocket-based live event streaming
+- **🔗 Multi-Chain Support**: Ethereum mainnet with more chains coming soon
+
+## API Sections
+
+- **Portfolio**: Manage and track NFT portfolios
+- **Security**: Advanced security analysis and threat detection
+- **Market**: Market data and analytics
+- **Traits**: NFT trait analysis and rarity scoring
+- **WebSocket**: Real-time event streaming
+"""
+
+APP_VERSION = "2.0.0"
+
+# Track application start time
+app_start_time = time.time()
+
+# Global WebSocket manager
+websocket_manager = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Handle application lifecycle events.
+    """
+    # Startup
+    logger.info(f"Starting {APP_TITLE} v{APP_VERSION}")
+    
+    try:
+        # Initialize WebSocket manager
+        global websocket_manager
+        from live.ws_manager import ConnectionManager
+        websocket_manager = ConnectionManager()
+        logger.info("WebSocket manager initialized")
+        
+        # Initialize services
+        await initialize_services()
+        
+        # Log successful startup
+        logger.info(f"{APP_TITLE} started successfully")
+        logger.info(f"API documentation available at: http://localhost:8001/docs")
+        
+    except Exception as e:
+        logger.error(f"Error during startup: {e}")
+        logger.error(traceback.format_exc())
+        raise
+    
+    yield
+    
+    # Shutdown
+    logger.info(f"Shutting down {APP_TITLE}")
+    await cleanup_services()
+    logger.info("Shutdown complete")
+
+# Create the main FastAPI application
+app = FastAPI(
+    title=APP_TITLE,
+    description=APP_DESCRIPTION,
+    version=APP_VERSION,
+    lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_tags=[
+        {"name": "health", "description": "Health check endpoints"},
+        {"name": "portfolio", "description": "Portfolio management endpoints"},
+        {"name": "security", "description": "Security analysis endpoints"},
+        {"name": "market", "description": "Market data and analytics"},
+        {"name": "traits", "description": "NFT trait analysis"},
+        {"name": "wallets", "description": "Wallet analysis and tracking"},
+        {"name": "websocket", "description": "Real-time WebSocket endpoints"},
+    ]
+)
+
+# Configure CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React development server
+        "http://localhost:5173",  # Vite development server
+        "http://localhost:8001",  # API development server
+        # Add production domains here
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+# Mount static files
+try:
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+except Exception as e:
+    logger.warning(f"Could not mount static files: {e}")
+
+async def initialize_services():
+    """
+    Initialize all required services during startup.
+    """
+    logger.info("Initializing services...")
+    
+    # Initialize cache
+    try:
+        from core.cache import initialize_cache
+        await initialize_cache()
+        logger.info("Cache service initialized")
+    except Exception as e:
+        logger.warning(f"Could not initialize cache: {e}")
+    
+    # Initialize database connections
+    try:
+        from core.config import settings
+        # Add database initialization here
+        logger.info("Database connections initialized")
+    except Exception as e:
+        logger.warning(f"Could not initialize database: {e}")
+
+async def cleanup_services():
+    """
+    Cleanup services during shutdown.
+    """
+    logger.info("Cleaning up services...")
+    
+    # Cleanup WebSocket connections
+    if websocket_manager:
+        # Disconnect all active connections
+        for client_id in list(websocket_manager.connections.keys()):
+            await websocket_manager.disconnect(client_id)
+    
+    # Add other cleanup tasks here
+
+# Health check endpoint
+@app.get("/health", tags=["health"])
+async def health_check():
+    """
+    Health check endpoint to verify the API is running.
+    
+    Returns:
+        dict: Health status information
+    """
+    uptime = time.time() - app_start_time
+    
+    return {
+        "status": "healthy",
+        "version": APP_VERSION,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "uptime_seconds": round(uptime, 2),
+        "environment": "development",  # TODO: Get from config
+    }
+
+# Root endpoint - serves the frontend
+@app.get("/", tags=["root"])
+async def root():
+    """
+    Root endpoint serving the XSEMA frontend application.
+    
+    Returns:
+        FileResponse: The frontend index.html file
+    """
+    from fastapi.responses import FileResponse
+    import os
+    
+    # Check if frontend files exist
+    index_path = os.path.join("static", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+    else:
+        # Fallback to API info if frontend not built
+        return {
+            "message": "Welcome to XSEMA",
+            "version": APP_VERSION,
+            "description": "Advanced NFT Security & Analytics Platform",
+            "status": "operational",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "documentation": "/docs",
+            "health_check": "/health",
+            "api_endpoints": {
+                "portfolio": "/api/v1/portfolio",
+                "market": "/api/v1",
+                "traits": "/api/v1/traits",
+                "security": "/api/v1/wallet-analysis",
+                "multi_chain": "/api/v1/multi-chain",
+                "websocket": "/ws"
+            },
+            "features": [
+                "🔒 Advanced Security Analysis",
+                "📊 Portfolio Management", 
+                "🔍 Market Analytics",
+                "🎯 Trait Analysis",
+                "⚡ Real-time Updates",
+                "🔗 Multi-Chain Support"
+            ],
+            "note": "Frontend not built. Run 'npm run build' in frontend/ directory."
+        }
+
+# Include API routers
+def include_routers():
+    """
+    Include all API routers in the application.
+    """
+    try:
+        # Portfolio API routes (using main router from __init__.py)
+        from portfolio.api.v1.endpoints import router as portfolio_router
+        app.include_router(portfolio_router, prefix="/api/v1/portfolio", tags=["portfolio"])
+        logger.info("Portfolio API routes included successfully")
+    except Exception as e:
+        logger.error(f"Error including portfolio routes: {e}")
+        logger.info("Portfolio routes disabled due to import issues")
+    
+    try:
+        # Market module routes (consolidated)
+        try:
+            from market.api.v1.endpoints import router as market_router
+            app.include_router(market_router, prefix="/api/v1", tags=["market"])
+            logger.info("Market module routes included successfully")
+        except Exception as e:
+            logger.error(f"Error including market routes: {e}")
+            
+        # Core API routes
+        try:
+            from api.v1.endpoints import traits, wallet_analysis
+            app.include_router(traits.router, prefix="/api/v1", tags=["traits"])
+            app.include_router(wallet_analysis.router, prefix="/api/v1", tags=["security"])
+            logger.info("Core API routes enabled successfully")
+        except Exception as e:
+            logger.error(f"Error enabling some core routes: {e}")
+            logger.info("Continuing with available routes")
+        
+        # Multi-chain API routes
+        try:
+            from api.v1.endpoints import multi_chain
+            app.include_router(multi_chain.router, prefix="/api/v1/multi-chain", tags=["multi-chain"])
+            logger.info("Multi-chain API routes included successfully")
+        except Exception as e:
+            logger.error(f"Error including multi-chain routes: {e}")
+            logger.info("Multi-chain routes disabled due to import issues")
+    except Exception as e:
+        logger.error(f"Error including core routes: {e}")
+    
+    # Note: Legacy routes removed as they were deprecated
+    logger.info("Legacy routes skipped (deprecated modules removed)")
+
+# Include routers after app creation
+include_routers()
+
+# Frontend routing catch-all - serves index.html for all non-API routes
+@app.get("/{full_path:path}")
+async def catch_all(full_path: str):
+    """
+    Catch-all route for frontend routing.
+    Serves index.html for all non-API routes to support React Router.
+    """
+    from fastapi.responses import FileResponse
+    import os
+    
+    # Skip API routes and static files
+    if full_path.startswith(("api/", "static/", "docs", "openapi.json", "health")):
+        raise HTTPException(status_code=404, detail="Not found")
+    
+    # Serve frontend index.html for all other routes
+    index_path = os.path.join("static", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+    else:
+        raise HTTPException(status_code=404, detail="Frontend not built")
+
+# WebSocket endpoint for real-time events
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """
+    WebSocket endpoint for real-time NFT event streaming.
+    
+    Protocol:
+    - Subscribe: {"type": "subscribe", "channels": ["nft_events", "sales"]}
+    - Unsubscribe: {"type": "unsubscribe", "channels": ["sales"]}
+    - Ping: {"type": "ping"}
+    """
+    if not websocket_manager:
+        await websocket.close(code=1011, reason="WebSocket service unavailable")
+        return
+    
+    client_id = f"client-{uuid.uuid4().hex[:8]}"
+    await websocket_manager.connect(websocket, client_id)
+    logger.info(f"WebSocket client connected: {client_id}")
+    
+    try:
+        while True:
+            try:
+                # Receive and process client messages
+                data = await websocket.receive_text()
+                
+                try:
+                    message = json.loads(data)
+                    await websocket_manager.handle_message(client_id, message)
+                except json.JSONDecodeError:
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": "Invalid JSON format"
+                    })
+                    
+            except WebSocketDisconnect:
+                logger.info(f"WebSocket client disconnected: {client_id}")
+                await websocket_manager.disconnect(client_id)
+                break
+                
+    except Exception as e:
+        logger.error(f"WebSocket error for {client_id}: {e}")
+        logger.error(traceback.format_exc())
+        await websocket_manager.disconnect(client_id)
+
+# Custom error handlers
+@app.exception_handler(404)
+async def not_found_handler(request, exc):
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": "Not Found",
+            "message": "The requested resource was not found",
+            "path": str(request.url.path)
+        }
+    )
+
+@app.exception_handler(500)
+async def internal_error_handler(request, exc):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal Server Error",
+            "message": "An unexpected error occurred",
+            "request_id": str(uuid.uuid4())
+        }
+    )
+
+if __name__ == "__main__":
+    # Run the application
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8001,
+        reload=True,
+        log_level="info",
+        access_log=True,
+    )

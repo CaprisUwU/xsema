@@ -1,0 +1,182 @@
+name: XSEMA CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+
+env:
+  PYTHON_VERSION: '3.11'
+  DOCKER_IMAGE: xsema
+  DOCKER_TAG: latest
+
+jobs:
+  # Test Suite
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11, 3.12]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-cov
+    
+    - name: Run tests
+      run: |
+        pytest tests/ -v --cov=core --cov=services --cov=portfolio --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
+
+  # Security Scan
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run security scan
+      uses: snyk/actions/python@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+
+  # Docker Build & Test
+  docker:
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build Docker image
+      run: docker build -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} .
+    
+    - name: Test Docker container
+      run: |
+        docker run -d --name xsema-test -p 8001:8001 ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+        sleep 30
+        curl -f http://localhost:8001/health
+        docker stop xsema-test
+        docker rm xsema-test
+
+  # Deploy to Staging
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [test, security, docker]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment..."
+        # Add your staging deployment commands here
+        # Example: kubectl apply -f k8s/staging/
+        # Or: docker-compose -f docker-compose.staging.yml up -d
+
+  # Deploy to Production
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [test, security, docker]
+    if: github.event_name == 'release'
+    environment: production
+    
+    steps:
+    - name: Deploy to production
+      run: |
+        echo "Deploying to production environment..."
+        # Add your production deployment commands here
+        # Example: kubectl apply -f k8s/production/
+        # Or: docker-compose -f docker-compose.production.yml up -d
+
+  # Performance Testing
+  performance:
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install locust
+    
+    - name: Run performance tests
+      run: |
+        python -m locust -f tests/performance/locustfile.py --headless -u 100 -r 10 --run-time 60s
+
+  # Network Health Check
+  network-health:
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+    
+    - name: Test network connectivity
+      run: |
+        python -c "
+        from dotenv import load_dotenv
+        load_dotenv()
+        from services.multi_chain_service import MultiChainService
+        import asyncio
+        
+        async def test_networks():
+            service = MultiChainService()
+            networks = ['ethereum', 'polygon', 'bsc', 'arbitrum', 'optimism']
+            results = {}
+            
+            for network in networks:
+                try:
+                    result = await service.test_connection(network)
+                    results[network] = result
+                    print(f'{network}: {"✅" if result else "❌"}')
+                except Exception as e:
+                    results[network] = False
+                    print(f'{network}: ❌ ({str(e)[:50]})')
+            
+            healthy_count = sum(1 for r in results.values() if r)
+            total_count = len(results)
+            print(f'\\nNetwork Health: {healthy_count}/{total_count} operational')
+            
+            if healthy_count < total_count * 0.8:
+                exit(1)
+        "

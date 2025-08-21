@@ -1,0 +1,169 @@
+{
+  "name": "Bored Ape Yacht Club",
+  "total_supply": 10000,
+  "trait_counts": {
+    "background": {
+      "blue": 1500,
+      "red": 1200,
+      "purple": 1000,
+      "yellow": 900,
+      "green": 800,
+      "orange": 700,
+      "gray": 600,
+      "brown": 500,
+      "black": 400,
+      "white": 300,
+      "pink": 200,
+      "gold": 100
+    },
+    "fur": {
+      "brown": 1200,
+      "black": 1100,
+      "gray": 1000,
+      "blue": 900,
+      "red": 800,
+      "white": 700,
+      "cheetah": 600,
+      "gold": 500,
+      "pink": 400,
+      "zombie": 300,
+      "rainbow": 100
+    },
+    "eyes": {
+      "closed": 1200,
+      "angry": 1100,
+      "sleepy": 1000,
+      "heart": 900,
+      "laser": 800,
+      "scumbag": 700,
+      "3d": 600,
+      "hypnotized": 500,
+      "blindfold": 400,
+      "x-eyes": 300,
+      "robot": 200,
+      "crying": 100
+    }
+  },
+  "tokens": [
+    {
+      "id": "1",
+      "traits": {
+        "background": "blue",
+        "fur": "brown",
+        "eyes": "closed",
+        "mouth": "bored",
+        "clothes": "tuxedo"
+      }
+    },
+    {
+      "id": "2",
+      "traits": {
+        "background": "red",
+        "fur": "black",
+        "eyes": "angry",
+        "mouth": "grin",
+        "hat": "fisherman's hat"
+      }
+    },
+    {
+      "id": "3",
+      "traits": {
+        "background": "purple",
+        "fur": "gray",
+        "eyes": "sleepy",
+        "mouth": "bored",
+        "earring": "silver"
+      }
+    },
+    {
+      "id": "4",
+      "traits": {
+        "background": "yellow",
+        "fur": "blue",
+        "eyes": "heart",
+        "mouth": "bored",
+        "hat": "cowboy"
+      }
+    },
+    {
+      "id": "5",
+      "traits": {
+        "background": "green",
+        "fur": "red",
+        "eyes": "laser",
+        "mouth": "bored",
+        "clothes": "leather jacket"
+      }
+    },
+    {
+      "id": "6",
+      "traits": {
+        "background": "orange",
+        "fur": "white",
+        "eyes": "scumbag",
+        "mouth": "bored",
+        "hat": "beanie"
+      }
+    },
+    {
+      "id": "7",
+      "traits": {
+        "background": "gray",
+        "fur": "cheetah",
+        "eyes": "3d",
+        "mouth": "bored",
+        "clothes": "tank"
+      }
+    },
+    {
+      "id": "8",
+      "traits": {
+        "background": "brown",
+        "fur": "gold",
+        "eyes": "hypnotized",
+        "mouth": "bored",
+        "hat": "crown"
+      }
+    },
+    {
+      "id": "9",
+      "traits": {
+        "background": "black",
+        "fur": "pink",
+        "eyes": "blindfold",
+        "mouth": "bored",
+        "clothes": "tuxedo"
+      }
+    },
+    {
+      "id": "10",
+      "traits": {
+        "background": "white",
+        "fur": "zombie",
+        "eyes": "x-eyes",
+        "mouth": "bored",
+        "hat": "party hat"
+      }
+    },
+    {
+      "id": "11",
+      "traits": {
+        "background": "pink",
+        "fur": "rainbow",
+        "eyes": "robot",
+        "mouth": "bored",
+        "clothes": "tuxedo"
+      }
+    },
+    {
+      "id": "12",
+      "traits": {
+        "background": "gold",
+        "fur": "brown",
+        "eyes": "crying",
+        "mouth": "bored",
+        "hat": "cowboy"
+      }
+    }
+  ]
+}

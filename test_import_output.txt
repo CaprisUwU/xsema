@@ -1,0 +1,25 @@
+Python version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+
+Current working directory: C:\Users\umard\OneDrive\Pictures\DisneyGames\Documents\Drop NTF_api
+
+Python path:
+  - C:\Users\umard\OneDrive\Pictures\DisneyGames\Documents\Drop NTF_api\tests\deprecated
+  - C:\Users\umard\OneDrive\Pictures\DisneyGames\Documents\Drop NTF_api
+  - C:\Users\umard\OneDrive\Pictures\DisneyGames\Documents\Drop NTF_api
+  - C:\Users\umard\OneDrive\Pictures\DisneyGames\Documents\Drop NTF_api
+  - C:\Users\umard\OneDrive\Pictures\DisneyGames\Documents\Drop NTF_api
+  - C:\Users\umard\AppData\Local\Programs\Python\Python313\python313.zip
+  - C:\Users\umard\AppData\Local\Programs\Python\Python313\DLLs
+  - C:\Users\umard\AppData\Local\Programs\Python\Python313\Lib
+  - C:\Users\umard\AppData\Local\Programs\Python\Python313
+  - C:\Users\umard\AppData\Roaming\Python\Python313\site-packages
+  - C:\Users\umard\AppData\Local\Programs\Python\Python313\Lib\site-packages
+  - C:\Users\umard\AppData\Local\Programs\Python\Python313\Lib\site-packages\win32
+  - C:\Users\umard\AppData\Local\Programs\Python\Python313\Lib\site-packages\win32\lib
+  - C:\Users\umard\AppData\Local\Programs\Python\Python313\Lib\site-packages\Pythonwin
+  - C:\Users\umard\OneDrive\Pictures\DisneyGames\Documents\Drop NTF_api
+  - C:\Users\umard\OneDrive\Pictures\DisneyGames\Documents\Drop NTF_api
+
+Attempting to import FastAPI application...
+
+Trying to import portfolio.main...

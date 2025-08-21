@@ -1,0 +1,82 @@
+groups:
+  - name: xsema_alerts
+    rules:
+      # API Health
+      - alert: XSEMA_API_DOWN
+        expr: up{job="xsema-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "XSEMA API is down"
+          description: "The XSEMA API has been down for more than 1 minute"
+
+      # Network Health
+      - alert: NETWORK_HEALTH_DEGRADED
+        expr: xsema_network_health_percentage < 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Network health degraded"
+          description: "Network health is below 80% for more than 2 minutes"
+
+      # High Response Time
+      - alert: HIGH_API_RESPONSE_TIME
+        expr: http_request_duration_seconds{quantile="0.95"} > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API response time"
+          description: "95th percentile response time is above 2 seconds"
+
+      # Error Rate
+      - alert: HIGH_ERROR_RATE
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate"
+          description: "Error rate is above 10% for more than 2 minutes"
+
+      # Database Connection
+      - alert: DATABASE_CONNECTION_FAILED
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection failed"
+          description: "Cannot connect to PostgreSQL database"
+
+      # Redis Connection
+      - alert: REDIS_CONNECTION_FAILED
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis connection failed"
+          description: "Cannot connect to Redis cache"
+
+      # Memory Usage
+      - alert: HIGH_MEMORY_USAGE
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 90% for more than 5 minutes"
+
+      # Disk Usage
+      - alert: HIGH_DISK_USAGE
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk usage"
+          description: "Disk usage is above 85% for more than 5 minutes"

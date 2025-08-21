@@ -1,0 +1,241 @@
+/* LiveNFTFeed.css */
+
+.live-nft-feed {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  background: #0f0f13;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  color: #e0e0e0;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+  border-bottom: 1px solid #2a2a3a;
+}
+
+.feed-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: #a0a0b0;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.connected {
+  background-color: #4caf50;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.status-indicator.disconnected {
+  background-color: #f44336;
+}
+
+.error-message {
+  background-color: #2d1a1a;
+  color: #ff6b6b;
+  padding: 12px 20px;
+  font-size: 0.875rem;
+  border-left: 3px solid #ff6b6b;
+  margin: 0 20px 10px;
+  border-radius: 4px;
+}
+
+.loading, .no-events {
+  padding: 40px 20px;
+  text-align: center;
+  color: #888;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: #4caf50;
+  animation: spin 1s ease-in-out infinite;
+  margin: 0 auto 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.events-container {
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a4a #1e1e2e;
+}
+
+.events-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.events-container::-webkit-scrollbar-track {
+  background: #1e1e2e;
+  border-radius: 3px;
+}
+
+.events-container::-webkit-scrollbar-thumb {
+  background-color: #3a3a4a;
+  border-radius: 3px;
+}
+
+.event-item {
+  background: #1a1a2a;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #2a2a3a;
+}
+
+.event-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-color: #3a3a5a;
+}
+
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2a2a3a;
+}
+
+.event-type {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.9375rem;
+}
+
+.event-time {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.detail-label {
+  color: #8e8e9e;
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.detail-value, .address {
+  color: #e0e0e0;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.875rem;
+  word-break: break-all;
+}
+
+.address {
+  color: #64b5f6;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.address:hover {
+  color: #90caf9;
+  text-decoration: underline;
+}
+
+.transfer-arrow {
+  margin: 0 8px;
+  color: #6c757d;
+  font-weight: bold;
+}
+
+.price {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.event-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #2a2a3a;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tx-link {
+  color: #64b5f6;
+  text-decoration: none;
+  font-size: 0.8125rem;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.tx-link:hover {
+  color: #90caf9;
+  text-decoration: underline;
+}
+
+.tx-link::after {
+  content: '↗';
+  margin-left: 4px;
+  font-size: 0.75em;
+  line-height: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .live-nft-feed {
+    border-radius: 0;
+    max-width: 100%;
+    height: 100vh;
+  }
+  
+  .events-container {
+    max-height: calc(100vh - 120px);
+  }
+  
+  .event-item {
+    margin: 0 8px 12px;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  
+  .transfer-arrow {
+    display: none;
+  }
+}

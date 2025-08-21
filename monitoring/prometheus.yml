@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "xsema_rules.yml"
+
+scrape_configs:
+  # XSEMA API
+  - job_name: 'xsema-api'
+    static_configs:
+      - targets: ['nft-engine:8001']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Network Health
+  - job_name: 'xsema-network-health'
+    static_configs:
+      - targets: ['nft-engine:8001']
+    metrics_path: '/api/v1/network-health'
+    scrape_interval: 30s
+
+  # PostgreSQL
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    scrape_interval: 30s
+
+  # Redis
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+
+  # Node Exporter (System metrics)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
