@@ -13,13 +13,14 @@ async def root():
             <h1>🚀 XSEMA Successfully Deployed on Railway!</h1>
             <p>Advanced NFT Security & Analytics Platform</p>
             <p>Status: ✅ Production Ready</p>
+            <p>Build: ✅ Optimized for Speed</p>
         </body>
     </html>
     """)
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy", "message": "XSEMA is running"}
+    return {"status": "healthy", "message": "XSEMA is running", "build": "optimized"}
 
 if __name__ == "__main__":
     import uvicorn

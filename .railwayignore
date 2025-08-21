@@ -36,14 +36,18 @@ Thumbs.db
 .env
 .env.local
 .env.production
-config/local.env
+config/
+setup.py
+setup_env.ps1
+fix_pydantic.ps1
+restart_server.ps1
 
 # Documentation
 docs/
 *.md
 !README.md
 
-# Frontend build artifacts (will be built during deployment)
+# Frontend (not needed for Railway)
 frontend/
 static/
 
@@ -51,6 +55,7 @@ static/
 tests/
 test_*.py
 *_test.py
+pytest.ini
 
 # Deployment scripts
 deploy-*.sh
@@ -58,3 +63,29 @@ deploy-*.ps1
 *.service
 nginx-*.conf
 PRODUCTION_*.md
+DEPLOYMENT_*.md
+
+# Core application (keep only essential)
+core/
+services/
+api/
+portfolio/
+market/
+utils/
+traits/
+models/
+live/
+examples/
+data/
+market_cache/
+my-app/
+scripts/
+k8s/
+monitoring/
+.github/
+
+# Logs and cache
+logs/
+websocket_client.log
+server.log
+.coverage
