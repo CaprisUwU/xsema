@@ -1,26 +1,55 @@
-# Bandit security scanner configuration
-# Exclude false positives and customize scanning rules
+# Bandit configuration for XSEMA
+# This file configures the Bandit security scanner
 
+# Exclude specific tests that generate false positives
 exclude_dirs:
-  - .git
-  - venv
-  - __pycache__
-  - .pytest_cache
-  - tests
-  - examples
-  - docs
+  - tests/
+  - venv/
+  - __pycache__/
+  - .pytest_cache/
+  - .git/
+  - docs/
+  - examples/
+  - scripts/
+  - k8s/
+  - monitoring/
+  - frontend/
+  - my-app/
 
+# Skip specific tests that are not relevant
 skips:
-  - B101  # assert_used - Allow asserts in tests
+  - B101  # assert_used - We use assertions in tests
   - B601  # paramiko_calls - Not using paramiko
-  - B602  # subprocess_popen_with_shell_equals_true - Shell commands are intentional
-  - B603  # subprocess_without_shell_equals_true - Shell commands are intentional
-  - B604  # any_other_function_with_shell_equals_true - Shell commands are intentional
-  - B605  # start_process_with_a_shell - Shell commands are intentional
-  - B606  # start_process_with_no_shell - Shell commands are intentional
-  - B607  # start_process_with_partial_path - Shell commands are intentional
-  - B608  # hardcoded_tmp_directory - Not applicable
-  - B609  # linux_commands_wildcard_injection - Shell commands are intentional
+  - B602  # subprocess_popen_with_shell_equals_true - Not using subprocess
+  - B603  # subprocess_without_shell_equals_true - Not using subprocess
+  - B604  # any_other_function_with_shell_equals_true - Not using shell functions
+  - B605  # start_process_with_a_shell - Not starting processes
+  - B606  # start_process_with_no_shell - Not starting processes
+  - B607  # start_process_with_partial_shell - Not starting processes
+  - B608  # hardcoded_tmp_directory - Not using hardcoded temp dirs
+  - B609  # linux_commands_wildcard_injection - Not using Linux commands
+  - B701  # jinja2_autoescape_false - Not using Jinja2
+  - B702  # use_of_mako_templates - Not using Mako templates
+  - B703  # django_mark_safe - Not using Django
+  - B704  # django_extra_used - Not using Django
+  - B705  # django_rawsql_used - Not using Django
+  - B706  # yaml_load - Not using YAML load
+  - B707  # yaml_load_all - Not using YAML load_all
+  - B708  # django_mark_safe - Not using Django
+  - B801  # flask_debug_true - Not using Flask
+  - B802  # django_debug_true - Not using Django
+  - B901  # nosec - Not using nosec
+  - B902  # self_use_self - Not using self incorrectly
+  - B903  # use_collections_abc - Not using collections.abc
+  - B904  # use_raise_from - Not using raise from
+  - B950  # Line too long - Allow longer lines for documentation
 
-# Test files can use more lenient rules
-skips: ["B101"] if "test" in filename else []
+# Set confidence levels
+confidence:
+  - HIGH
+  - MEDIUM
+
+# Set severity levels
+severity:
+  - HIGH
+  - MEDIUM

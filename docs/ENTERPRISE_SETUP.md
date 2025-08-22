@@ -42,7 +42,7 @@ XSEMA Enterprise provides:
 
 ### **Dependencies**
 ```bash
-pip install sqlalchemy bcrypt PyJWT ldap3 python-multipart
+pip install sqlalchemy bcrypt PyJWT python-multipart
 ```
 
 ---
