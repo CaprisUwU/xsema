@@ -1,0 +1,26 @@
+# Bandit security scanner configuration
+# Exclude false positives and customize scanning rules
+
+exclude_dirs:
+  - .git
+  - venv
+  - __pycache__
+  - .pytest_cache
+  - tests
+  - examples
+  - docs
+
+skips:
+  - B101  # assert_used - Allow asserts in tests
+  - B601  # paramiko_calls - Not using paramiko
+  - B602  # subprocess_popen_with_shell_equals_true - Shell commands are intentional
+  - B603  # subprocess_without_shell_equals_true - Shell commands are intentional
+  - B604  # any_other_function_with_shell_equals_true - Shell commands are intentional
+  - B605  # start_process_with_a_shell - Shell commands are intentional
+  - B606  # start_process_with_no_shell - Shell commands are intentional
+  - B607  # start_process_with_partial_path - Shell commands are intentional
+  - B608  # hardcoded_tmp_directory - Not applicable
+  - B609  # linux_commands_wildcard_injection - Shell commands are intentional
+
+# Test files can use more lenient rules
+skips: ["B101"] if "test" in filename else []
