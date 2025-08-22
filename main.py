@@ -224,6 +224,7 @@ async def root():
                 "traits": "/api/v1/traits",
                 "security": "/api/v1/wallet-analysis",
                 "multi_chain": "/api/v1/multi-chain",
+                "enterprise_auth": "/api/v1/enterprise",
                 "websocket": "/ws"
             },
             "features": [
@@ -278,6 +279,15 @@ def include_routers():
         except Exception as e:
             logger.error(f"Error including multi-chain routes: {e}")
             logger.info("Multi-chain routes disabled due to import issues")
+            
+        # Enterprise Authentication API routes
+        try:
+            from api.v1.endpoints import enterprise_auth
+            app.include_router(enterprise_auth.router, prefix="/api/v1/enterprise", tags=["enterprise-auth"])
+            logger.info("Enterprise Authentication API routes included successfully")
+        except Exception as e:
+            logger.error(f"Error including enterprise auth routes: {e}")
+            logger.info("Enterprise auth routes disabled due to import issues")
     except Exception as e:
         logger.error(f"Error including core routes: {e}")
     
