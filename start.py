@@ -5,19 +5,34 @@ This script handles the PORT environment variable and starts the FastAPI applica
 """
 
 import os
+import sys
 import uvicorn
 from main import app
 
 if __name__ == "__main__":
-    # Get port from Railway environment variable, default to 8000
-    port = int(os.environ.get("PORT", 8000))
-    
-    print(f"Starting XSEMA on port {port}")
-    
-    # Start the FastAPI application
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=port,
-        reload=False
-    )
+    try:
+        # Get port from Railway environment variable, default to 8000
+        port_str = os.environ.get("PORT", "8000")
+        
+        # Ensure port is a valid integer
+        try:
+            port = int(port_str)
+        except ValueError:
+            print(f"❌ Invalid PORT value: {port_str}. Using default port 8000.")
+            port = 8000
+        
+        print(f"🚀 Starting XSEMA on port {port}")
+        print(f"🌐 Environment: {os.environ.get('RAILWAY_ENVIRONMENT', 'development')}")
+        
+        # Start the FastAPI application
+        uvicorn.run(
+            "main:app",
+            host="0.0.0.0",
+            port=port,
+            reload=False,
+            log_level="info"
+        )
+        
+    except Exception as e:
+        print(f"❌ Failed to start XSEMA: {e}")
+        sys.exit(1)
