@@ -10,14 +10,15 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 import uvicorn
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 import json
 import uuid
 import traceback
 from typing import Optional
+import os
+import mimetypes
 
 # Configure logging
 logging.basicConfig(
@@ -131,11 +132,7 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
-# Mount static files
-try:
-    app.mount("/static", StaticFiles(directory="static"), name="static")
-except Exception as e:
-    logger.warning(f"Could not mount static files: {e}")
+# Static files are handled by custom handler below
 
 async def initialize_services():
     """
@@ -218,15 +215,17 @@ async def root():
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "documentation": "/docs",
             "health_check": "/health",
-            "api_endpoints": {
-                "portfolio": "/api/v1/portfolio",
-                "market": "/api/v1",
-                "traits": "/api/v1/traits",
-                "security": "/api/v1/wallet-analysis",
-                "multi_chain": "/api/v1/multi-chain",
-                "enterprise_auth": "/api/v1/enterprise",
-                "websocket": "/ws"
-            },
+                               "api_endpoints": {
+                       "portfolio": "/api/v1/portfolio",
+                       "market": "/api/v1",
+                       "traits": "/api/v1/traits",
+                       "security": "/api/v1/wallet-analysis",
+                       "multi_chain": "/api/v1/multi-chain",
+                       "enterprise_auth": "/api/v1/enterprise",
+                       "saml_auth": "/api/v1/saml",
+                       "oauth_auth": "/api/v1/oauth",
+                       "websocket": "/ws"
+                   },
             "features": [
                 "🔒 Advanced Security Analysis",
                 "📊 Portfolio Management", 
@@ -237,6 +236,8 @@ async def root():
             ],
             "note": "Frontend not built. Run 'npm run build' in frontend/ directory."
         }
+
+
 
 # Include API routers
 def include_routers():
@@ -288,6 +289,33 @@ def include_routers():
         except Exception as e:
             logger.error(f"Error including enterprise auth routes: {e}")
             logger.info("Enterprise auth routes disabled due to import issues")
+        
+        # SAML Authentication API routes
+        try:
+            from api.v1.endpoints import saml_auth
+            app.include_router(saml_auth.router, prefix="/api/v1/saml", tags=["saml-auth"])
+            logger.info("SAML Authentication API routes included successfully")
+        except Exception as e:
+            logger.error(f"Error including SAML auth routes: {e}")
+            logger.info("SAML auth routes disabled due to import issues")
+        
+        # SAML Configuration API routes
+        try:
+            from api.v1.endpoints import saml_config
+            app.include_router(saml_config.router, prefix="/api/v1/saml", tags=["saml-config"])
+            logger.info("SAML Configuration API routes included successfully")
+        except Exception as e:
+            logger.error(f"Error including SAML config routes: {e}")
+            logger.info("SAML config routes disabled due to import issues")
+        
+        # OAuth 2.0 Authentication API routes
+        try:
+            from api.v1.endpoints import oauth_auth
+            app.include_router(oauth_auth.router, prefix="/api/v1/oauth", tags=["oauth-auth"])
+            logger.info("OAuth 2.0 Authentication API routes included successfully")
+        except Exception as e:
+            logger.error(f"Error including OAuth auth routes: {e}")
+            logger.info("OAuth auth routes disabled due to import issues")
     except Exception as e:
         logger.error(f"Error including core routes: {e}")
     
@@ -296,6 +324,117 @@ def include_routers():
 
 # Include routers after app creation
 include_routers()
+
+# Enhanced static file handler optimized for Railway - MUST be BEFORE catch-all
+@app.get("/static/{file_path:path}")
+async def serve_static_files(file_path: str):
+    """
+    Enhanced static file handler with proper MIME type detection.
+    Optimized for Railway deployment with fallback handling.
+    """
+    # Handle root /static/ path
+    if not file_path or file_path == "":
+        return {
+            "message": "Static files directory",
+            "note": "Access specific files like /static/index.html, /static/assets/script.js, etc."
+        }
+    
+    file_path_full = os.path.join("static", file_path)
+    
+    if not os.path.exists(file_path_full):
+        raise HTTPException(status_code=404, detail=f"File not found: {file_path}")
+    
+    # Comprehensive MIME type mapping for Railway
+    mime_types = {
+        # JavaScript
+        '.js': 'application/javascript',
+        '.mjs': 'application/javascript',
+        '.jsx': 'application/javascript',
+        
+        # CSS
+        '.css': 'text/css',
+        '.scss': 'text/x-scss',
+        '.sass': 'text/x-sass',
+        
+        # Images
+        '.svg': 'image/svg+xml',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif',
+        '.webp': 'image/webp',
+        '.ico': 'image/x-icon',
+        '.bmp': 'image/bmp',
+        
+        # Fonts
+        '.woff': 'font/woff',
+        '.woff2': 'font/woff2',
+        '.ttf': 'font/ttf',
+        '.otf': 'font/otf',
+        '.eot': 'application/vnd.ms-fontobject',
+        
+        # Documents
+        '.html': 'text/html',
+        '.htm': 'text/html',
+        '.json': 'application/json',
+        '.xml': 'application/xml',
+        '.txt': 'text/plain',
+        '.pdf': 'application/pdf',
+        
+        # Archives
+        '.zip': 'application/zip',
+        '.tar': 'application/x-tar',
+        '.gz': 'application/gzip',
+        
+        # Web specific
+        '.webmanifest': 'application/manifest+json',
+        '.webp': 'image/webp',
+        '.webm': 'video/webm',
+    }
+    
+    # Get file extension
+    file_ext = os.path.splitext(file_path)[1].lower()
+    
+    # Determine MIME type
+    mime_type = mime_types.get(file_ext, 'application/octet-stream')
+    
+    # Special handling for specific files
+    if file_path.endswith('site.webmanifest'):
+        mime_type = 'application/manifest+json'
+    elif file_path.endswith('.js') and 'assets' in file_path:
+        mime_type = 'application/javascript'
+    elif file_path.endswith('.css') and 'assets' in file_path:
+        mime_type = 'text/css'
+    
+    # Create response with proper headers
+    try:
+        response = FileResponse(
+            file_path_full, 
+            media_type=mime_type,
+            headers={
+                "Cache-Control": "public, max-age=31536000",  # 1 year cache
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+                "X-Content-Type-Options": "nosniff",
+                "X-Frame-Options": "DENY",
+                "X-XSS-Protection": "1; mode=block"
+            }
+        )
+        
+        # Add specific headers for JavaScript files
+        if mime_type == 'application/javascript':
+            response.headers["Content-Type"] = "application/javascript; charset=utf-8"
+        elif mime_type == 'text/css':
+            response.headers["Content-Type"] = "text/css; charset=utf-8"
+        elif mime_type == 'application/manifest+json':
+            response.headers["Content-Type"] = "application/manifest+json; charset=utf-8"
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error serving static file {file_path}: {e}")
+        raise HTTPException(status_code=500, detail=f"Error serving file: {e}")
 
 # Frontend routing catch-all - serves index.html for all non-API routes
 @app.get("/{full_path:path}")

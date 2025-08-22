@@ -32,7 +32,27 @@ class MultiChainService:
         self.web3_instances: Dict[ChainType, Web3] = {}
         self.sessions: Dict[ChainType, aiohttp.ClientSession] = {}
         self.connection_status: Dict[ChainType, bool] = {}
-        self._initialize_connections()
+        # Don't initialize connections in constructor - will be done lazily
+    
+    async def _initialize_connections_async(self):
+        """Initialize Web3 connections asynchronously without blocking."""
+        for chain_type in multi_chain_config.get_supported_networks():
+            try:
+                network_config = get_network_config(chain_type)
+                if not network_config or not network_config.rpc_url:
+                    logger.warning(f"No RPC URL configured for {chain_type}")
+                    continue
+                
+                # Initialize Web3 for EVM chains
+                if chain_type != ChainType.SOLANA:
+                    await self._init_web3_connection_async(chain_type, network_config)
+                else:
+                    # Solana will be handled separately
+                    self.connection_status[chain_type] = False
+                    
+            except Exception as e:
+                logger.error(f"Failed to initialize {chain_type}: {e}")
+                self.connection_status[chain_type] = False
     
     def _initialize_connections(self):
         """Initialize Web3 connections for all supported networks."""
@@ -101,6 +121,64 @@ class MultiChainService:
                         if attempt < max_retries - 1:
                             logger.debug(f"Connection attempt {attempt + 1} failed for {chain_type} via {rpc_url}: {e}, retrying...")
                             time.sleep(retry_delay)
+                        else:
+                            logger.debug(f"All connection attempts failed for {chain_type} via {rpc_url}: {e}")
+                
+            except Exception as e:
+                logger.debug(f"Error initializing {chain_type} via {rpc_url}: {e}")
+                continue
+        
+        # If we get here, all RPC URLs failed
+        logger.warning(f"Failed to connect to {chain_type} via all available RPC URLs")
+        self.connection_status[chain_type] = False
+    
+    async def _init_web3_connection_async(self, chain_type: ChainType, network_config: NetworkConfig):
+        """Initialize Web3 connection for an EVM chain asynchronously."""
+        # Try primary RPC URL first, then fallback if available
+        rpc_urls = [network_config.rpc_url]
+        
+        # Add fallback URLs if they exist in environment
+        fallback_key = f"{chain_type.upper()}_RPC_URL_ALT"
+        fallback_url = os.getenv(fallback_key)
+        if fallback_url:
+            rpc_urls.append(fallback_url)
+        
+        # Try each RPC URL
+        for rpc_url in rpc_urls:
+            try:
+                w3 = Web3(Web3.HTTPProvider(rpc_url, request_kwargs={'timeout': 30}))
+                
+                # Inject POA middleware for chains that need it
+                if chain_type in [ChainType.POLYGON, ChainType.BSC, ChainType.AVALANCHE, ChainType.FANTOM]:
+                    w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
+                
+                # Test connection with retry logic
+                max_retries = 3
+                retry_delay = 2  # seconds
+                
+                for attempt in range(max_retries):
+                    try:
+                        # Test connection
+                        if w3.is_connected():
+                            # Double-check with a simple RPC call
+                            chain_id = w3.eth.chain_id
+                            block_number = w3.eth.block_number
+                            
+                            self.web3_instances[chain_type] = w3
+                            self.connection_status[chain_type] = True
+                            logger.info(f"Connected to {chain_type} via {rpc_url} (Chain ID: {chain_id}, Block: {block_number})")
+                            return
+                        else:
+                            if attempt < max_retries - 1:
+                                logger.debug(f"Connection attempt {attempt + 1} failed for {chain_type} via {rpc_url}, retrying in {retry_delay}s...")
+                                await asyncio.sleep(retry_delay)
+                            else:
+                                logger.debug(f"Failed to connect to {chain_type} via {rpc_url} after {max_retries} attempts")
+                                
+                    except Exception as e:
+                        if attempt < max_retries - 1:
+                            logger.debug(f"Connection attempt {attempt + 1} failed for {chain_type} via {rpc_url}: {e}, retrying...")
+                            await asyncio.sleep(retry_delay)
                         else:
                             logger.debug(f"All connection attempts failed for {chain_type} via {rpc_url}: {e}")
                 
@@ -455,15 +533,26 @@ class MultiChainService:
                 logger.error(f"Error closing session: {e}")
 
 
-# Global instance
-multi_chain_service = MultiChainService()
+# Global instance - lazy initialization
+_multi_chain_service = None
 
 
 async def get_multi_chain_service() -> MultiChainService:
-    """Get the global multi-chain service instance."""
-    return multi_chain_service
+    """Get the global multi-chain service instance with lazy initialization."""
+    global _multi_chain_service
+    
+    if _multi_chain_service is None:
+        _multi_chain_service = MultiChainService()
+        # Initialize connections asynchronously without blocking
+        asyncio.create_task(_multi_chain_service._initialize_connections_async())
+    
+    return _multi_chain_service
 
 
 async def close_multi_chain_service():
     """Close the global multi-chain service."""
-    await multi_chain_service.close_connections()
+    global _multi_chain_service
+    
+    if _multi_chain_service:
+        await _multi_chain_service.close_connections()
+        _multi_chain_service = None
