@@ -16,8 +16,22 @@ import jwt
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
-import ldap3
-from ldap3 import Server, Connection, ALL, NTLM, SIMPLE
+
+# Handle optional ldap3 dependency
+try:
+    import ldap3
+    from ldap3 import Server, Connection, ALL, NTLM, SIMPLE
+    LDAP_AVAILABLE = True
+except ImportError:
+    LDAP_AVAILABLE = False
+    # Create dummy classes for type hints
+    class Server:
+        pass
+    class Connection:
+        pass
+    ALL = None
+    NTLM = None
+    SIMPLE = None
 
 
 class AuthProvider(str, Enum):
