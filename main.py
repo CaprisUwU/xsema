@@ -133,6 +133,8 @@ app.add_middleware(
 )
 
 # Static files are handled by custom handler below
+# Note: If custom handler fails on Railway, uncomment the line below:
+# from fastapi.staticfiles import StaticFiles
 
 async def initialize_services():
     """
@@ -325,6 +327,10 @@ def include_routers():
 # Include routers after app creation
 include_routers()
 
+# FALLBACK OPTION: If custom static handler fails on Railway, uncomment these lines:
+# from fastapi.staticfiles import StaticFiles
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+
 # Enhanced static file handler optimized for Railway - MUST be BEFORE catch-all
 @app.get("/static/{file_path:path}")
 async def serve_static_files(file_path: str):
@@ -332,6 +338,9 @@ async def serve_static_files(file_path: str):
     Enhanced static file handler with proper MIME type detection.
     Optimized for Railway deployment with fallback handling.
     """
+    # Debug logging for Railway troubleshooting
+    logger.info(f"Static file request: {file_path}")
+    
     # Handle root /static/ path
     if not file_path or file_path == "":
         return {
@@ -340,6 +349,8 @@ async def serve_static_files(file_path: str):
         }
     
     file_path_full = os.path.join("static", file_path)
+    logger.info(f"Full file path: {file_path_full}")
+    logger.info(f"File exists: {os.path.exists(file_path_full)}")
     
     if not os.path.exists(file_path_full):
         raise HTTPException(status_code=404, detail=f"File not found: {file_path}")
