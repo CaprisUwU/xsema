@@ -1,8 +1,8 @@
 # 🚀 XSEMA - Advanced NFT Security & Analytics Platform
 
-**Current Status**: 🟢 **PRODUCTION READY - FRONTEND DEPLOYED**  
+**Current Status**: 🟢 **PRODUCTION READY - LIVE ON RAILWAY WITH CUSTOM DOMAIN**  
 **Version**: 2.0.0  
-**Last Updated**: 21st August 2025
+**Last Updated**: 23rd August 2025
 
 **XSEMA is a proprietary, commercial NFT analytics platform. All rights reserved.**
 
@@ -91,7 +91,18 @@
 
 ---
 
-## 🚀 **PRODUCTION DEPLOYMENT**
+## 🚀 **LIVE PRODUCTION DEPLOYMENT**
+
+### **✅ Currently Live on Railway**
+XSEMA is now **LIVE** and operational with a professional custom domain:
+
+- **🌐 Custom Domain**: https://xsema.co.uk (SSL certificate issuing)
+- **🚀 Railway Subdomain**: https://xsema-production.up.railway.app
+- **🔒 Security**: Enterprise-grade HTTPS/SSL
+- **📊 Status**: All endpoints responding and healthy
+- **⚡ Performance**: Production optimized and scalable
+
+### **✅ Production Ready**
 
 ### **✅ Ready for Production**
 XSEMA is now production-ready with complete deployment automation:
@@ -257,5 +268,6 @@ chmod +x deploy-production-frontend.sh
 
 **For the latest status and updates, see `CURRENT_STATUS.md`**  
 **For business inquiries and licensing, see `BUSINESS_CONTACT.md`**
-#   X S E M A   R a i l w a y   R e a d y   -   0 8 / 2 1 / 2 0 2 5   2 2 : 0 1 : 0 0  
+#   X S E M A   R a i l w a y   R e a d y   -   0 8 / 2 1 / 2 0 2 5   2 2 : 0 1 : 0 0 
+ 
  
