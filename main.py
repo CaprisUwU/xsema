@@ -205,7 +205,7 @@ async def root():
     
     # Debug: Check working directory and file paths
     current_dir = os.getcwd()
-    index_path = os.path.join("static", "index.html")
+    index_path = os.path.join(current_dir, "static", "index.html")  # Fixed: use full path
     static_dir = os.path.join(current_dir, "static")
     
     logger.info(f"Root route accessed - Current directory: {current_dir}")
@@ -365,7 +365,7 @@ async def serve_static_files(file_path: str):
             "note": "Access specific files like /static/index.html, /static/assets/script.js, etc."
         }
     
-    file_path_full = os.path.join("static", file_path)
+    file_path_full = os.path.join(os.getcwd(), "static", file_path)
     logger.info(f"Full file path: {file_path_full}")
     logger.info(f"File exists: {os.path.exists(file_path_full)}")
     
