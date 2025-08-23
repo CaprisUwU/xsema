@@ -203,8 +203,25 @@ async def root():
     from fastapi.responses import FileResponse
     import os
     
-    # Check if frontend files exist
+    # Debug: Check working directory and file paths
+    current_dir = os.getcwd()
     index_path = os.path.join("static", "index.html")
+    static_dir = os.path.join(current_dir, "static")
+    
+    logger.info(f"Root route accessed - Current directory: {current_dir}")
+    logger.info(f"Static directory path: {static_dir}")
+    logger.info(f"Index file path: {index_path}")
+    logger.info(f"Static directory exists: {os.path.exists(static_dir)}")
+    logger.info(f"Index file exists: {os.path.exists(index_path)}")
+    
+    # List contents of static directory
+    if os.path.exists(static_dir):
+        try:
+            static_contents = os.listdir(static_dir)
+            logger.info(f"Static directory contents: {static_contents}")
+        except Exception as e:
+            logger.error(f"Error listing static directory: {e}")
+    
     if os.path.exists(index_path):
         return FileResponse(index_path, media_type="text/html")
     else:
