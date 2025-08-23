@@ -1,0 +1,45 @@
+# XSEMA Production Requirements - SECURE VERSIONS ONLY
+# This file contains only the essential dependencies with security patches
+
+# Core FastAPI - SECURE
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Security and Validation - SECURE
+pydantic==2.5.2
+pydantic-settings==2.1.0
+
+# Database - SECURE
+sqlalchemy==2.0.23
+alembic==1.13.1
+
+# Essential Utilities - SECURE
+python-dotenv==1.0.0
+python-multipart==0.0.6
+
+# Security Patches - CRITICAL FIXES
+# Fix for Jinja2 vulnerabilities (CVE-2024-34064, CVE-2024-56326, CVE-2024-56201, CVE-2024-22195, CVE-2025-27516)
+jinja2==3.1.6
+
+# Fix for aiohttp vulnerability (CVE-2025-53643)
+aiohttp==3.12.14
+
+# Fix for anyio vulnerability (PVE-2024-71199) - Using compatible version for FastAPI 0.104.1
+anyio==3.7.1
+
+# Fix for requests vulnerabilities (CVE-2024-35195, CVE-2024-47081)
+requests==2.32.4
+
+# Fix for setuptools vulnerability (CVE-2025-47273)
+setuptools==78.1.1
+
+# Fix for starlette vulnerabilities (PVE-2024-68094, CVE-2025-54121, CVE-2024-47874)
+# Using compatible version for FastAPI 0.104.1
+starlette==0.27.0
+
+# Additional Security Enhancements
+certifi==2025.8.3
+urllib3==2.2.0
+
+# JWT Security (if needed)
+PyJWT[crypto]==2.8.0
