@@ -75,21 +75,33 @@ async def lifespan(app: FastAPI):
     try:
         # Initialize WebSocket manager
         global websocket_manager
-        from live.ws_manager import ConnectionManager
-        websocket_manager = ConnectionManager()
-        logger.info("WebSocket manager initialized")
+        try:
+            from live.ws_manager import ConnectionManager
+            websocket_manager = ConnectionManager()
+            logger.info("WebSocket manager initialized")
+        except ImportError as e:
+            logger.warning(f"WebSocket manager not available: {e}")
+            websocket_manager = None
+        except Exception as e:
+            logger.warning(f"WebSocket manager initialization failed: {e}")
+            websocket_manager = None
         
         # Initialize services
-        await initialize_services()
+        try:
+            await initialize_services()
+        except Exception as e:
+            logger.warning(f"Service initialization failed: {e}")
+            logger.warning("Continuing with basic functionality")
         
         # Log successful startup
         logger.info(f"{APP_TITLE} started successfully")
-        logger.info(f"API documentation available at: http://localhost:{os.environ.get('PORT', '8001')}/docs")
+        logger.info(f"API documentation available at: http://localhost:{os.environ.get('PORT', '8080')}/docs")
         
     except Exception as e:
-        logger.error(f"Error during startup: {e}")
+        logger.error(f"Critical error during startup: {e}")
         logger.error(traceback.format_exc())
-        raise
+        # Don't raise - let the app start with limited functionality
+        logger.warning("App starting with limited functionality due to startup errors")
     
     yield
     
@@ -188,7 +200,7 @@ async def health_check():
         "version": APP_VERSION,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "uptime_seconds": round(uptime, 2),
-        "environment": "development",  # TODO: Get from config
+        "environment": os.environ.get("RAILWAY_ENVIRONMENT", "development"),
     }
 
 # Root endpoint - serves the frontend
