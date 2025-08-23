@@ -84,7 +84,7 @@ async def lifespan(app: FastAPI):
         
         # Log successful startup
         logger.info(f"{APP_TITLE} started successfully")
-        logger.info(f"API documentation available at: http://localhost:8001/docs")
+        logger.info(f"API documentation available at: http://localhost:{os.environ.get('PORT', '8001')}/docs")
         
     except Exception as e:
         logger.error(f"Error during startup: {e}")
@@ -526,11 +526,13 @@ async def internal_error_handler(request, exc):
 
 if __name__ == "__main__":
     # Run the application
+    import os
+    port = int(os.environ.get("PORT", 8001))
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8001,
-        reload=True,
+        port=port,
+        reload=False,  # Disable reload in production
         log_level="info",
         access_log=True,
     )

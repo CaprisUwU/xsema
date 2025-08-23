@@ -36,6 +36,18 @@ class Settings(BaseSettings):
             raise ValueError(f"LOG_LEVEL must be one of: {valid_levels}")
         return v.upper()
     
+    @field_validator('PORT')
+    @classmethod
+    def validate_port(cls, v: int) -> int:
+        """Validate and override port with environment variable if set."""
+        env_port = os.environ.get("PORT")
+        if env_port:
+            try:
+                return int(env_port)
+            except ValueError:
+                pass
+        return v
+    
     # Database settings
     DATABASE_URL: Optional[str] = Field(default=None, description="Database connection URL")
     DATABASE_POOL_SIZE: int = Field(default=10, description="Database connection pool size")
