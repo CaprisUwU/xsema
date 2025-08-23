@@ -1,0 +1,101 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation
+*.md
+docs/
+*.txt
+!requirements*.txt
+
+# Development files
+tests/
+test_*.py
+*_test.py
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+logs/
+server.log
+websocket_client.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache
+cache/
+market_cache/
+__pycache__/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Railway specific
+.railwayignore
+railway*.json
+railway*.toml
+railway*.py
+railway*.sh
+railway*.ps1
+
+# Deployment scripts
+deploy*.sh
+deploy*.ps1
+deploy*.md
+
+# Other
+.env
+.env.local
+.env.production
