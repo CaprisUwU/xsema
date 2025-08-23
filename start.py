@@ -26,7 +26,7 @@ if __name__ == "__main__":
         
         # Start the FastAPI application
         uvicorn.run(
-            "main:app",
+            "app:app",
             host="0.0.0.0",
             port=port,
             reload=False,
