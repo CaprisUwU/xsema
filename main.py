@@ -20,6 +20,18 @@ app = FastAPI(
     version="2.0.0"
 )
 
+# Add startup event to log when app starts
+@app.on_event("startup")
+async def startup_event():
+    logger.info("🚀 XSEMA FastAPI application starting up...")
+    logger.info(f"📊 App title: {app.title}")
+    logger.info(f"🔢 App version: {app.version}")
+
+# Add shutdown event to log when app shuts down
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("🛑 XSEMA FastAPI application shutting down...")
+
 # Configure CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -107,5 +119,7 @@ async def api_info():
 
 if __name__ == "__main__":
     import uvicorn
+    # This block is only used for local development
+    # Railway uses start.py which handles the PORT environment variable
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
