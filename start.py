@@ -7,7 +7,7 @@ This script handles the PORT environment variable and starts the FastAPI applica
 import os
 import sys
 import uvicorn
-from main import app
+from app import app
 
 if __name__ == "__main__":
     try:
