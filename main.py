@@ -26,6 +26,11 @@ async def startup_event():
     logger.info("🚀 XSEMA FastAPI application starting up...")
     logger.info(f"📊 App title: {app.title}")
     logger.info(f"🔢 App version: {app.version}")
+    
+    # Add a small delay to ensure app is fully ready
+    import asyncio
+    await asyncio.sleep(1)
+    logger.info("✅ App startup complete and ready to serve requests")
 
 # Add shutdown event to log when app shuts down
 @app.on_event("shutdown")
