@@ -589,3 +589,15 @@ async def internal_error_handler(request: Request, exc: HTTPException):
     </body>
     </html>
     """, status_code=500)
+
+# Main execution block for local development
+if __name__ == "__main__":
+    import uvicorn
+    logger.info("🚀 Starting XSEMA server locally...")
+    uvicorn.run(
+        "app:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        log_level="info"
+    )
