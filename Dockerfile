@@ -37,5 +37,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 # Expose port
 EXPOSE 8000
 
-# Run the application - Using app.py as the main entry point
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Run the application - Using railway_start.py as Railway expects
+CMD ["python", "railway_start.py"]
