@@ -106,16 +106,16 @@ async def log_requests(request: Request, call_next):
 async def login_page():
     """Show login information"""
     logger.info("🔐 Login page requested")
-    return HTMLResponse(content=f"""
+    return HTMLResponse(content="""
     <html>
     <head>
         <title>Login - XSEMA Demo</title>
         <style>
-            body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-            .container {{ max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-            .info {{ background: #4ecdc4; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }}
-            .warning {{ background: #ff6b6b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }}
-            .credentials {{ background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #007bff; }}
+            body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+            .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            .info { background: #4ecdc4; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .warning { background: #ff6b6b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .credentials { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #007bff; }
         </style>
     </head>
     <body>
@@ -134,8 +134,8 @@ async def login_page():
             
             <div class="credentials">
                 <h3>🔑 Demo Credentials</h3>
-                <p><strong>Username:</strong> {DEMO_USERNAME}</p>
-                <p><strong>Password:</strong> {DEMO_PASSWORD}</p>
+                <p><strong>Username:</strong> """ + DEMO_USERNAME + """</p>
+                <p><strong>Password:</strong> """ + DEMO_PASSWORD + """</p>
                 <p><em>These are demo credentials for demonstration purposes only.</em></p>
             </div>
             
@@ -186,22 +186,22 @@ async def terms_of_service():
                 terms_content = f.read()
             
             # Simple HTML conversion without complex markdown parsing
-            html_content = f"""
+            html_content = """
             <html>
             <head>
                 <title>Terms of Service - XSEMA Demo</title>
                 <style>
-                    body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; line-height: 1.6; }}
-                    .container {{ max-width: 900px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-                    .warning {{ background: #ff6b6b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }}
-                    h1, h2, h3 {{ color: #2c3e50; }}
-                    h1 {{ border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
-                    h2 {{ border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin-top: 30px; }}
-                    ul, ol {{ margin: 20px 0; }}
-                    li {{ margin: 10px 0; }}
-                    .footer {{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; }}
-                    pre {{ background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }}
-                    code {{ background: #f8f9fa; padding: 2px 4px; border-radius: 3px; }}
+                    body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; line-height: 1.6; }
+                    .container { max-width: 900px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                    .warning { background: #ff6b6b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
+                    h1, h2, h3 { color: #2c3e50; }
+                    h1 { border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+                    h2 { border-bottom: 2px solid #ecf0f1; padding-bottom: 5px; margin-top: 30px; }
+                    ul, ol { margin: 20px 0; }
+                    li { margin: 10px 0; }
+                    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; }
+                    pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+                    code { background: #f8f9fa; padding: 2px 4px; border-radius: 3px; }
                 </style>
             </head>
             <body>
@@ -212,7 +212,7 @@ async def terms_of_service():
                     </div>
                     
                     <div class="terms-content">
-                        {terms_content.replace('# ', '<h1>').replace('## ', '<h2>').replace('### ', '<h3>').replace('#### ', '<h4>').replace('\n\n', '</p><p>').replace('\n- ', '</p><p>• ').replace('\n', '<br>')}
+                        """ + terms_content.replace('# ', '<h1>').replace('## ', '<h2>').replace('### ', '<h3>').replace('#### ', '<h4>').replace('\n\n', '</p><p>').replace('\n- ', '</p><p>• ').replace('\n', '<br>') + """
                     </div>
                     
                     <div class="footer">
@@ -232,14 +232,14 @@ async def terms_of_service():
     except Exception as e:
         logger.error(f"❌ Error serving terms of service: {e}")
         # Return a simple error page instead of raising an exception
-        return HTMLResponse(content=f"""
+        return HTMLResponse(content="""
         <html>
         <head>
             <title>Error - XSEMA Demo</title>
             <style>
-                body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-                .container {{ max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-                .error {{ background: #ff6b6b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }}
+                body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+                .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                .error { background: #ff6b6b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
             </style>
         </head>
         <body>
@@ -247,7 +247,7 @@ async def terms_of_service():
                 <h1>❌ Error Loading Terms of Service</h1>
                 <div class="error">
                     <p><strong>Sorry, there was an error loading the terms of service.</strong></p>
-                    <p>Error: {str(e)}</p>
+                    <p>Error: """ + str(e) + """</p>
                 </div>
                 <p><a href="/">← Return to XSEMA Demo</a></p>
                 <p><em>XSEMA Demo Version - For demonstration purposes only</em></p>
@@ -267,7 +267,7 @@ async def root(current_user: str = Depends(get_current_user)):
                 html_content = f.read()
             
             # Add disclaimer banner to the HTML
-            disclaimer_banner = f"""
+            disclaimer_banner = """
             <div style="
                 background: linear-gradient(135deg, #ff6b6b, #ee5a24);
                 color: white;
@@ -294,7 +294,7 @@ async def root(current_user: str = Depends(get_current_user)):
             """
             
             # Insert disclaimer after <body> tag
-            html_content = html_content.replace('<body>', f'<body>{disclaimer_banner}')
+            html_content = html_content.replace('<body>', '<body>' + disclaimer_banner)
             
             logger.info(f"✅ Frontend served successfully with disclaimer to user: {current_user}")
             return HTMLResponse(content=html_content)
@@ -303,15 +303,15 @@ async def root(current_user: str = Depends(get_current_user)):
             raise HTTPException(status_code=404, detail="Frontend not found")
     except Exception as e:
         logger.error(f"❌ Error serving frontend: {e}")
-        return HTMLResponse(content=f"""
+        return HTMLResponse(content="""
         <html>
         <head>
             <title>XSEMA - Demo Version</title>
             <style>
-                body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-                .container {{ max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-                .warning {{ background: #ff6b6b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }}
-                .info {{ background: #4ecdc4; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }}
+                body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+                .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                .warning { background: #ff6b6b; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
+                .info { background: #4ecdc4; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
             </style>
         </head>
         <body>
@@ -337,7 +337,7 @@ async def root(current_user: str = Depends(get_current_user)):
                 </div>
                 
                 <h3>🔧 Technical Status</h3>
-                <p>Error: {str(e)}</p>
+                <p>Error: """ + str(e) + """</p>
                 <p>Please contact support if this issue persists.</p>
                 
                 <hr>
@@ -400,7 +400,7 @@ async def catch_all(full_path: str, current_user: str = Depends(get_current_user
                 html_content = f.read()
             
             # Add disclaimer banner (same as root route)
-            disclaimer_banner = f"""
+            disclaimer_banner = """
             <div style="
                 background: linear-gradient(135deg, #ff6b6b, #ee5a24);
                 color: white;
@@ -426,7 +426,7 @@ async def catch_all(full_path: str, current_user: str = Depends(get_current_user
             <div style="margin-top: 80px;"></div>
             """
             
-            html_content = html_content.replace('<body>', f'<body>{disclaimer_banner}')
+            html_content = html_content.replace('<body>', '<body>' + disclaimer_banner)
             
             logger.info(f"✅ SPA route {full_path} served successfully with disclaimer to user: {current_user}")
             return HTMLResponse(content=html_content)
@@ -440,7 +440,7 @@ async def catch_all(full_path: str, current_user: str = Depends(get_current_user
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: HTTPException):
     logger.warning(f"❌ 404 Not Found: {request.url}")
-    return HTMLResponse(content=f"""
+    return HTMLResponse(content="""
     <html>
     <head><title>Page Not Found - XSEMA Demo</title></head>
     <body style="font-family: Arial, sans-serif; text-align: center; margin: 50px;">
@@ -458,7 +458,7 @@ async def not_found_handler(request: Request, exc: HTTPException):
 @app.exception_handler(500)
 async def internal_error_handler(request: Request, exc: HTTPException):
     logger.error(f"❌ 500 Internal Server Error: {request.url} - {exc}")
-    return HTMLResponse(content=f"""
+    return HTMLResponse(content="""
     <html>
     <head><title>Server Error - XSEMA Demo</title></head>
     <body style="font-family: Arial, sans-serif; text-align: center; margin: 50px;">
@@ -476,7 +476,7 @@ async def internal_error_handler(request: Request, exc: HTTPException):
 @app.exception_handler(401)
 async def unauthorized_handler(request: Request, exc: HTTPException):
     logger.warning(f"❌ 401 Unauthorized: {request.url}")
-    return HTMLResponse(content=f"""
+    return HTMLResponse(content="""
     <html>
     <head><title>Login Required - XSEMA Demo</title></head>
     <body style="font-family: Arial, sans-serif; text-align: center; margin: 50px;">
@@ -487,8 +487,8 @@ async def unauthorized_handler(request: Request, exc: HTTPException):
         </div>
         <div style="background: #4ecdc4; color: white; padding: 20px; margin: 20px; border-radius: 8px;">
             <h3>🔑 Demo Credentials</h3>
-            <p><strong>Username:</strong> {DEMO_USERNAME}</p>
-            <p><strong>Password:</strong> {DEMO_PASSWORD}</p>
+            <p><strong>Username:</strong> """ + DEMO_USERNAME + """</p>
+            <p><strong>Password:</strong> """ + DEMO_PASSWORD + """</p>
         </div>
         <p><a href="/login">View Login Instructions</a></p>
         <p><em>XSEMA Demo Version - For demonstration purposes only</em></p>
