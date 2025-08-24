@@ -5,6 +5,10 @@
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 
+# Pydantic dependencies (required for config)
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
 # Critical security fixes
 jinja2==3.1.6
 aiohttp==3.12.14
@@ -21,3 +25,7 @@ python-multipart==0.0.6
 PyJWT==2.8.0
 bcrypt==4.1.2
 email-validator==2.1.0
+
+# Additional core dependencies
+pathlib2==2.3.7
+typing-extensions==4.8.0
