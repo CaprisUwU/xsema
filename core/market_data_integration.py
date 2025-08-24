@@ -125,7 +125,7 @@ class MarketDataManager:
         # Blur configuration
         self.configs[Marketplace.BLUR] = MarketplaceConfig(
             marketplace=Marketplace.BLUR,
-            api_url="https://api.blur.io",
+            api_url="https://api.blur.io/v1",
             api_key=os.getenv("BLUR_API_KEY"),
             rate_limit=150,
             enabled=bool(os.getenv("BLUR_ENABLED", "true").lower() == "true"),
@@ -245,53 +245,64 @@ class MarketDataManager:
                 if response.status == 200:
                     data = await response.json()
                     
-                    # Extract NFT data
-                    nft_data = data.get("nft", {})
-                    market_data = data.get("market_data", {})
+                    # Debug: Log the response structure
+                    logger.debug(f"OpenSea API response: {data}")
                     
-                    # Parse attributes
-                    attributes = []
-                    if "traits" in nft_data:
-                        for trait in nft_data["traits"]:
-                            attributes.append({
-                                "trait_type": trait.get("trait_type"),
-                                "value": trait.get("value"),
-                                "display_type": trait.get("display_type")
-                            })
-                    
-                    # Parse market data
-                    current_price = None
-                    current_price_currency = None
-                    if "floor_price" in market_data:
-                        current_price = float(market_data["floor_price"]["amount"])
-                        current_price_currency = market_data["floor_price"]["currency"]
-                    
-                    floor_price = None
-                    floor_price_currency = None
-                    if "floor_price" in market_data:
-                        floor_price = float(market_data["floor_price"]["amount"])
-                        floor_price_currency = market_data["floor_price"]["currency"]
-                    
-                    return NFTMarketData(
-                        token_id=token_id,
-                        contract_address=contract_address,
-                        network=network,
-                        marketplace=Marketplace.OPENSEA,
-                        name=nft_data.get("name", f"#{token_id}"),
-                        description=nft_data.get("description", ""),
-                        image_url=nft_data.get("image_url", ""),
-                        external_url=nft_data.get("external_url"),
-                        current_price=current_price,
-                        current_price_currency=current_price_currency,
-                        floor_price=floor_price,
-                        floor_price_currency=floor_price_currency,
-                        collection_name=nft_data.get("collection", {}).get("name"),
-                        collection_slug=nft_data.get("collection", {}).get("slug"),
-                        collection_verified=nft_data.get("collection", {}).get("verified", False),
-                        attributes=attributes,
-                        last_updated=datetime.now(),
-                        data_source="opensea"
-                    )
+                    # Handle different response formats
+                    if isinstance(data, dict):
+                        # Extract NFT data
+                        nft_data = data.get("nft", {})
+                        market_data = data.get("market_data", {})
+                        
+                        # Parse attributes
+                        attributes = []
+                        if "traits" in nft_data and isinstance(nft_data["traits"], list):
+                            for trait in nft_data["traits"]:
+                                if isinstance(trait, dict):
+                                    attributes.append({
+                                        "trait_type": trait.get("trait_type"),
+                                        "value": trait.get("value"),
+                                        "display_type": trait.get("display_type")
+                                    })
+                        
+                        # Parse market data safely
+                        current_price = None
+                        current_price_currency = None
+                        floor_price = None
+                        floor_price_currency = None
+                        
+                        if "floor_price" in market_data and isinstance(market_data["floor_price"], dict):
+                            try:
+                                floor_price = float(market_data["floor_price"].get("amount", 0))
+                                floor_price_currency = market_data["floor_price"].get("currency", "ETH")
+                                current_price = floor_price
+                                current_price_currency = floor_price_currency
+                            except (ValueError, TypeError):
+                                logger.warning("Invalid floor price data from OpenSea")
+                        
+                        return NFTMarketData(
+                            token_id=token_id,
+                            contract_address=contract_address,
+                            network=network,
+                            marketplace=Marketplace.OPENSEA,
+                            name=nft_data.get("name", f"#{token_id}"),
+                            description=nft_data.get("description", ""),
+                            image_url=nft_data.get("image_url", ""),
+                            external_url=nft_data.get("external_url"),
+                            current_price=current_price,
+                            current_price_currency=current_price_currency,
+                            floor_price=floor_price,
+                            floor_price_currency=floor_price_currency,
+                            collection_name=nft_data.get("collection", {}).get("name") if isinstance(nft_data.get("collection"), dict) else None,
+                            collection_slug=nft_data.get("collection", {}).get("slug") if isinstance(nft_data.get("collection"), dict) else None,
+                            collection_verified=nft_data.get("collection", {}).get("verified", False) if isinstance(nft_data.get("collection"), dict) else False,
+                            attributes=attributes,
+                            last_updated=datetime.now(),
+                            data_source="opensea"
+                        )
+                    else:
+                        logger.warning(f"Unexpected OpenSea API response format: {type(data)}")
+                        return None
                 else:
                     logger.warning(f"OpenSea API returned {response.status}")
                     return None
@@ -448,6 +459,8 @@ async def test_market_data_integration():
                 print("❌ OpenSea: Failed to fetch data")
         else:
             print("⚠️ OpenSea: No API key configured")
+            print("   To test OpenSea, set OPENSEA_API_KEY environment variable")
+            print("   Example: $env:OPENSEA_API_KEY='920418bd75db4fa2a05780bff97a0f32'")
         
         # Test Magic Eden
         print("\nTesting Magic Eden integration...")

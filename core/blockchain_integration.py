@@ -74,8 +74,8 @@ class BlockchainIntegrationManager:
         # Ethereum configuration
         self.configs[BlockchainNetwork.ETHEREUM] = BlockchainConfig(
             network=BlockchainNetwork.ETHEREUM,
-            rpc_url=os.getenv("ETHEREUM_RPC_URL", "https://mainnet.infura.io/v3/"),
-            api_key=os.getenv("INFURA_API_KEY"),
+            rpc_url=os.getenv("ETHEREUM_RPC_URL", "https://eth.llamarpc.com"),
+            api_key=os.getenv("ETHEREUM_API_KEY"),
             chain_id=1,
             block_time=12,
             enabled=bool(os.getenv("ETHEREUM_ENABLED", "true").lower() == "true")
