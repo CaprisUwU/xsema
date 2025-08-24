@@ -290,11 +290,14 @@ async def api_status():
         "timestamp": datetime.now().isoformat(),
         "disclaimer": "DEMO VERSION - NOT FOR REAL INVESTMENT USE",
         "access": "Public demo - No authentication required",
+        "phase": "Phase 4 - Real Data Integration",
         "features": {
             "portfolio_tracking": "demo_mode",
             "market_data": "simulated",
             "security_analysis": "prototype",
-            "analytics": "mock_data"
+            "analytics": "mock_data",
+            "blockchain_integration": "ready",
+            "market_data_integration": "ready"
         },
         "warnings": [
             "This is a demonstration prototype",
@@ -302,6 +305,200 @@ async def api_status():
             "Do not make investment decisions based on this information",
             "For real investment advice, consult qualified professionals"
         ]
+    }
+
+@app.get("/api/v1/blockchain/status")
+async def blockchain_status():
+    """Get blockchain network status"""
+    logger.info("🔗 Blockchain status requested")
+    try:
+        from core.blockchain_integration import blockchain_manager
+        status = blockchain_manager.get_network_status()
+        return {
+            "status": "success",
+            "data": status,
+            "timestamp": datetime.now().isoformat(),
+            "message": "Blockchain network status retrieved successfully"
+        }
+    except Exception as e:
+        logger.error(f"❌ Error getting blockchain status: {e}")
+        return {
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat(),
+            "message": "Failed to retrieve blockchain status"
+        }
+
+@app.get("/api/v1/blockchain/test")
+async def test_blockchain_connections():
+    """Test blockchain connections"""
+    logger.info("🧪 Blockchain connection test requested")
+    try:
+        from core.blockchain_integration import test_blockchain_connections
+        results = await test_blockchain_connections()
+        return {
+            "status": "success",
+            "data": results,
+            "timestamp": datetime.now().isoformat(),
+            "message": "Blockchain connection test completed"
+        }
+    except Exception as e:
+        logger.error(f"❌ Error testing blockchain connections: {e}")
+        return {
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat(),
+            "message": "Failed to test blockchain connections"
+        }
+
+@app.get("/api/v1/marketplace/status")
+async def marketplace_status():
+    """Get marketplace integration status"""
+    logger.info("📊 Marketplace status requested")
+    try:
+        from core.market_data_integration import market_data_manager
+        status = market_data_manager.get_marketplace_status()
+        return {
+            "status": "success",
+            "data": status,
+            "timestamp": datetime.now().isoformat(),
+            "message": "Marketplace status retrieved successfully"
+        }
+    except Exception as e:
+        logger.error(f"❌ Error getting marketplace status: {e}")
+        return {
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat(),
+            "message": "Failed to retrieve marketplace status"
+        }
+
+@app.get("/api/v1/nft/{contract_address}/{token_id}")
+async def get_nft_data(contract_address: str, token_id: str, network: str = "ethereum"):
+    """Get real NFT data from marketplaces"""
+    logger.info(f"🖼️ NFT data requested: {contract_address}:{token_id} on {network}")
+    try:
+        from core.market_data_integration import market_data_manager
+        
+        async with market_data_manager as manager:
+            nft_data = await manager.get_nft_data(contract_address, token_id, network)
+            
+            if nft_data:
+                return {
+                    "status": "success",
+                    "data": {
+                        "token_id": nft_data.token_id,
+                        "contract_address": nft_data.contract_address,
+                        "network": nft_data.network,
+                        "marketplace": nft_data.marketplace.value,
+                        "name": nft_data.name,
+                        "description": nft_data.description,
+                        "image_url": nft_data.image_url,
+                        "current_price": nft_data.current_price,
+                        "current_price_currency": nft_data.current_price_currency,
+                        "floor_price": nft_data.floor_price,
+                        "floor_price_currency": nft_data.floor_price_currency,
+                        "collection_name": nft_data.collection_name,
+                        "collection_verified": nft_data.collection_verified,
+                        "attributes": nft_data.attributes,
+                        "last_updated": nft_data.last_updated.isoformat() if nft_data.last_updated else None,
+                        "data_source": nft_data.data_source
+                    },
+                    "timestamp": datetime.now().isoformat(),
+                    "message": "NFT data retrieved successfully"
+                }
+            else:
+                return {
+                    "status": "not_found",
+                    "data": None,
+                    "timestamp": datetime.now().isoformat(),
+                    "message": "NFT data not available"
+                }
+                
+    except Exception as e:
+        logger.error(f"❌ Error getting NFT data: {e}")
+        return {
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat(),
+            "message": "Failed to retrieve NFT data"
+        }
+
+@app.get("/api/v1/collection/{contract_address}")
+async def get_collection_data(contract_address: str, network: str = "ethereum"):
+    """Get collection data from marketplaces"""
+    logger.info(f"🏛️ Collection data requested: {contract_address} on {network}")
+    try:
+        from core.market_data_integration import market_data_manager
+        
+        async with market_data_manager as manager:
+            collection_data = await manager.get_collection_data(contract_address, network)
+            
+            if collection_data:
+                return {
+                    "status": "success",
+                    "data": collection_data,
+                    "timestamp": datetime.now().isoformat(),
+                    "message": "Collection data retrieved successfully"
+                }
+            else:
+                return {
+                    "status": "not_found",
+                    "data": None,
+                    "timestamp": datetime.now().isoformat(),
+                    "message": "Collection data not available"
+                }
+                
+    except Exception as e:
+        logger.error(f"❌ Error getting collection data: {e}")
+        return {
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat(),
+            "message": "Failed to retrieve collection data"
+        }
+
+@app.get("/api/v1/phase4/status")
+async def phase4_status():
+    """Get Phase 4 implementation status"""
+    logger.info("🚀 Phase 4 status requested")
+    return {
+        "status": "success",
+        "data": {
+            "phase": "Phase 4 - Real Data Integration",
+            "completion": "25%",
+            "components": {
+                "blockchain_integration": {
+                    "status": "ready",
+                    "description": "Blockchain API connections ready",
+                    "networks": ["ethereum", "polygon", "bsc", "arbitrum", "optimism", "base", "avalanche", "fantom", "solana"]
+                },
+                "market_data_integration": {
+                    "status": "ready",
+                    "description": "NFT marketplace data integration ready",
+                    "marketplaces": ["opensea", "magic_eden", "blur", "looksrare", "x2y2"]
+                },
+                "real_time_data": {
+                    "status": "in_progress",
+                    "description": "WebSocket connections for live updates",
+                    "progress": "10%"
+                },
+                "user_authentication": {
+                    "status": "planned",
+                    "description": "Secure user accounts and JWT tokens",
+                    "progress": "0%"
+                }
+            },
+            "next_steps": [
+                "Set up environment variables for API keys",
+                "Test blockchain connections",
+                "Test marketplace data integration",
+                "Implement WebSocket connections",
+                "Add user authentication system"
+            ]
+        },
+        "timestamp": datetime.now().isoformat(),
+        "message": "Phase 4 status retrieved successfully"
     }
 
 # Catch-all route for SPA routing
