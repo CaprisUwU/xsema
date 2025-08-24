@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     
     # Server settings
     HOST: str = Field(default="0.0.0.0", description="Server host")
-    PORT: int = Field(default=8001, description="Server port")
+    PORT: int = Field(default=8000, description="Server port")
     WORKERS: int = Field(default=1, description="Number of worker processes")
     
     # Logging

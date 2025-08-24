@@ -44,7 +44,7 @@ async def test_request(request: Request):
     }
 
 if __name__ == "__main__":
-    port = 8001
+    port = 8000
     print(f"Starting test FastAPI server on port {port}...")
     print(f"Python version: {sys.version}")
     print(f"Working directory: {os.getcwd()}")

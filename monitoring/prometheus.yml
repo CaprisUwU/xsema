@@ -9,14 +9,14 @@ scrape_configs:
   # XSEMA API
   - job_name: 'xsema-api'
     static_configs:
-      - targets: ['nft-engine:8001']
+      - targets: ['nft-engine:8000']
     metrics_path: '/metrics'
     scrape_interval: 10s
 
   # Network Health
   - job_name: 'xsema-network-health'
     static_configs:
-      - targets: ['nft-engine:8001']
+      - targets: ['nft-engine:8000']
     metrics_path: '/api/v1/network-health'
     scrape_interval: 30s
 

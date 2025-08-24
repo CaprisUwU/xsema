@@ -21,7 +21,7 @@ spec:
       - name: xsema-api
         image: xsema:latest
         ports:
-        - containerPort: 8001
+        - containerPort: 8000
         env:
         - name: DATABASE_URL
           valueFrom:
@@ -45,13 +45,13 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 8001
+            port: 8000
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: 8001
+            port: 8000
           initialDelaySeconds: 5
           periodSeconds: 5
         volumeMounts:
@@ -80,7 +80,7 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 8001
+    targetPort: 8000
   type: ClusterIP
 
 ---

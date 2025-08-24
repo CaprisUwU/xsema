@@ -1,12 +1,25 @@
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi import FastAPI, HTTPException, Request, Depends, status, Query
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import logging
 import os
 from pathlib import Path
 from datetime import datetime
 import json
+from typing import Dict, Any
+
+# Import authentication modules
+from core.authentication import (
+    auth_manager, 
+    authenticate_user, 
+    register_user,
+    UserRegistration, 
+    UserLogin,
+    UserProfile,
+    TokenData
+)
 
 # Configure comprehensive logging
 logging.basicConfig(
@@ -466,7 +479,7 @@ async def phase4_status():
         "status": "success",
         "data": {
             "phase": "Phase 4 - Real Data Integration",
-            "completion": "25%",
+            "completion": "45%",
             "components": {
                 "blockchain_integration": {
                     "status": "ready",
@@ -484,22 +497,276 @@ async def phase4_status():
                     "progress": "10%"
                 },
                 "user_authentication": {
-                    "status": "planned",
+                    "status": "implemented",
                     "description": "Secure user accounts and JWT tokens",
-                    "progress": "0%"
+                    "progress": "100%",
+                    "features": ["JWT tokens", "bcrypt hashing", "user roles", "mock database"],
+                    "endpoints": ["/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/profile", "/api/v1/auth/status"]
                 }
             },
             "next_steps": [
-                "Set up environment variables for API keys",
-                "Test blockchain connections",
-                "Test marketplace data integration",
+                "Test authentication endpoints",
+                "Set up PostgreSQL database",
+                "Migrate from mock to real database",
                 "Implement WebSocket connections",
-                "Add user authentication system"
+                "Add portfolio management features"
             ]
         },
         "timestamp": datetime.now().isoformat(),
         "message": "Phase 4 status retrieved successfully"
     }
+
+# =============================================================================
+# AUTHENTICATION ENDPOINTS - Phase 4
+# =============================================================================
+
+# Security scheme for JWT tokens
+security = HTTPBearer()
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> TokenData:
+    """Dependency to get current authenticated user from JWT token"""
+    try:
+        token = credentials.credentials
+        user_data = auth_manager.verify_token(token)
+        if user_data is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return user_data
+    except Exception as e:
+        logger.error(f"❌ Token verification failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+@app.post("/api/v1/auth/register", response_model=Dict[str, Any])
+async def user_registration(user_data: UserRegistration):
+    """User registration endpoint"""
+    try:
+        logger.info(f"📝 User registration requested for {user_data.username}")
+        
+        # Register new user
+        new_user = await register_user(user_data)
+        if not new_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Registration failed - username or email already exists"
+            )
+        
+        # Convert enums to strings for JSON serialization
+        new_user_response = {
+            "id": new_user["id"],
+            "username": new_user["username"],
+            "email": new_user["email"],
+            "first_name": new_user["first_name"],
+            "last_name": new_user["last_name"],
+            "role": new_user["role"].value if hasattr(new_user["role"], 'value') else str(new_user["role"]),
+            "status": new_user["status"].value if hasattr(new_user["status"], 'value') else str(new_user["status"]),
+            "created_at": new_user["created_at"].isoformat(),
+            "is_verified": new_user["is_verified"]
+        }
+        
+        # Create tokens
+        access_token = auth_manager.create_access_token(new_user_response)
+        refresh_token = auth_manager.create_refresh_token(new_user_response)
+        
+        logger.info(f"✅ User {user_data.username} registered successfully")
+        
+        return {
+            "status": "success",
+            "message": "User registered successfully",
+            "data": {
+                "user": new_user_response,
+                "tokens": {
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
+                    "token_type": "bearer"
+                }
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ User registration failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error during registration"
+        )
+
+@app.post("/api/v1/auth/login", response_model=Dict[str, Any])
+async def user_login(login_data: UserLogin):
+    """User login endpoint"""
+    try:
+        logger.info(f"🔐 User login requested for {login_data.username}")
+        
+        # Authenticate user
+        user = await authenticate_user(login_data.username, login_data.password)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Convert enums to strings for JSON serialization
+        user_response = {
+            "id": user["id"],
+            "username": user["username"],
+            "email": user["email"],
+            "first_name": user["first_name"],
+            "last_name": user["last_name"],
+            "role": user["role"].value if hasattr(user["role"], 'value') else str(user["role"]),
+            "status": user["status"].value if hasattr(user["status"], 'value') else str(user["status"]),
+            "last_login": user["last_login"].isoformat() if user["last_login"] else None,
+            "is_verified": user["is_verified"]
+        }
+        
+        # Create tokens
+        access_token = auth_manager.create_access_token(user_response)
+        refresh_token = auth_manager.create_refresh_token(user_response)
+        
+        logger.info(f"✅ User {login_data.username} logged in successfully")
+        
+        return {
+            "status": "success",
+            "message": "Login successful",
+            "data": {
+                "user": user_response,
+                "tokens": {
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
+                    "token_type": "bearer"
+                }
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ User login failed: {e}")
+        logger.error(f"❌ Error type: {type(e)}")
+        logger.error(f"❌ Error details: {str(e)}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal server error during login: {str(e)}"
+        )
+
+@app.post("/api/v1/auth/refresh", response_model=Dict[str, Any])
+async def refresh_token(refresh_token: str = Query(..., description="Refresh token")):
+    """Refresh access token endpoint"""
+    try:
+        logger.info("🔄 Token refresh requested")
+        
+        # Refresh access token
+        new_access_token = auth_manager.refresh_access_token(refresh_token)
+        if not new_access_token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        logger.info("✅ Access token refreshed successfully")
+        
+        return {
+            "status": "success",
+            "message": "Token refreshed successfully",
+            "data": {
+                "access_token": new_access_token,
+                "token_type": "bearer"
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Token refresh failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error during token refresh"
+        )
+
+@app.get("/api/v1/auth/profile", response_model=Dict[str, Any])
+async def get_user_profile(current_user: TokenData = Depends(get_current_user)):
+    """Get current user profile"""
+    try:
+        logger.info(f"👤 Profile requested for user {current_user.username}")
+        
+        # Get user data from mock database
+        from core.authentication import mock_db
+        user = mock_db.get_user_by_username(current_user.username)
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        return {
+            "status": "success",
+            "message": "Profile retrieved successfully",
+            "data": {
+                "user": {
+                    "id": user["id"],
+                    "username": user["username"],
+                    "email": user["email"],
+                    "first_name": user["first_name"],
+                    "last_name": user["last_name"],
+                    "role": user["role"].value if hasattr(user["role"], 'value') else str(user["role"]),
+                    "status": user["status"].value if hasattr(user["status"], 'value') else str(user["status"]),
+                    "created_at": user["created_at"].isoformat(),
+                    "last_login": user["last_login"].isoformat() if user["last_login"] else None,
+                    "is_verified": user["is_verified"]
+                }
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Profile retrieval failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error during profile retrieval"
+        )
+
+@app.get("/api/v1/auth/status", response_model=Dict[str, Any])
+async def get_auth_status():
+    """Get authentication system status"""
+    try:
+        logger.info("🔐 Authentication status requested")
+        
+        return {
+            "status": "success",
+            "message": "Authentication system status",
+            "data": {
+                "system": "active",
+                "jwt_algorithm": auth_manager.algorithm,
+                "access_token_expire_minutes": auth_manager.access_token_expire_minutes,
+                "refresh_token_expire_days": auth_manager.refresh_token_expire_days,
+                "bcrypt_rounds": auth_manager.bcrypt_rounds,
+                "demo_user_available": True,
+                "demo_credentials": {
+                    "username": "demo",
+                    "password": "xsema2025"
+                },
+                "timestamp": datetime.now().isoformat()
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Auth status check failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error during status check"
+        )
 
 # Catch-all route for SPA routing
 @app.get("/{full_path:path}")
