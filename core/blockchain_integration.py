@@ -218,6 +218,15 @@ class BlockchainIntegrationManager:
                     else:
                         logger.warning(f"❌ RPC error from {network.value}: {data.get('error')}")
                         return False
+                elif response.status == 401:
+                    logger.warning(f"❌ Authentication required for {network.value} - API key needed")
+                    return False
+                elif response.status == 403:
+                    logger.warning(f"❌ Access forbidden for {network.value} - check API key permissions")
+                    return False
+                elif response.status == 429:
+                    logger.warning(f"❌ Rate limited for {network.value} - too many requests")
+                    return False
                 else:
                     logger.warning(f"❌ HTTP {response.status} from {network.value}")
                     return False
@@ -313,7 +322,7 @@ async def test_blockchain_connections():
         
         for network, success in results.items():
             status = "✅ CONNECTED" if success else "❌ FAILED"
-            print(f"{network.upper():<15} {status}")
+            print(f"{network.value.upper():<15} {status}")
         
         print(f"\n📊 Summary: {sum(results.values())}/{len(results)} networks connected")
         return results

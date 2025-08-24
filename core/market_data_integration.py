@@ -303,8 +303,8 @@ class MarketDataManager:
     async def _get_magic_eden_nft_data(self, contract_address: str, token_id: str) -> Optional[NFTMarketData]:
         """Get NFT data from Magic Eden API"""
         try:
-            # Magic Eden API endpoint
-            url = f"{self.configs[Marketplace.MAGIC_EDEN].api_url}/tokens/{contract_address}:{token_id}"
+            # Magic Eden API endpoint - use mint address directly
+            url = f"{self.configs[Marketplace.MAGIC_EDEN].api_url}/tokens/{contract_address}"
             
             async with self.session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as response:
                 if response.status == 200:
