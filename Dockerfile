@@ -26,6 +26,9 @@ RUN pip install --no-cache-dir -r requirements-minimal-secure.txt
 # Copy project
 COPY . .
 
+# Debug: List files to ensure railway_start.py is copied
+RUN ls -la && echo "=== Checking for railway_start.py ===" && ls -la railway_start.py || echo "railway_start.py not found!"
+
 # Change ownership to app user
 RUN chown -R app:app /app
 USER app
@@ -38,4 +41,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 EXPOSE 8000
 
 # Run the application - Using railway_start.py as Railway expects
-CMD ["python", "railway_start.py"]
+# Fallback to direct uvicorn if railway_start.py fails
+CMD ["sh", "-c", "python railway_start.py || uvicorn app:app --host 0.0.0.0 --port 8000"]

@@ -82,13 +82,13 @@ __pycache__/
 *.bak
 *.backup
 
-# Railway specific
+# Railway specific - BUT KEEP railway_start.py
 .railwayignore
 railway*.json
 railway*.toml
-railway*.py
 railway*.sh
 railway*.ps1
+# NOT excluding railway_start.py - it's needed for Docker startup
 
 # Deployment scripts
 deploy*.sh
