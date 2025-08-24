@@ -243,28 +243,35 @@ pytest tests/security/
 
 ---
 
-## 🤝 **CONTRIBUTING**
+## 💼 **BUSINESS & LICENSING**
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+**XSEMA is a proprietary, commercial NFT analytics platform. All rights reserved.**
 
-### **Development Workflow**
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
+### **Enterprise Solutions**
+- **B2B Licensing** - Enterprise platform access
+- **Custom Integration** - Tailored solutions for large organizations
+- **Professional Services** - Implementation and support
+- **White-Label Options** - Platform licensing for partners
 
-### **Code Standards**
-- **Python**: Black formatting, type hints
-- **JavaScript**: ESLint, Prettier
-- **Testing**: 90%+ coverage required
-- **Documentation**: Comprehensive docstrings
+### **Contact for Business Inquiries**
+- **Enterprise Sales**: [Business Contact](BUSINESS_CONTACT.md)
+- **Licensing**: hello@xsema.co.uk
+- **Partnerships**: [Business Development](BUSINESS_CONTACT.md)
+- **Support**: Enterprise support available
+
+**For detailed business information, pricing, and licensing, see `BUSINESS_CONTACT.md`**
 
 ---
 
 ## 📄 **LICENSE**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**XSEMA is proprietary commercial software. All rights reserved.**
+
+**This platform is NOT open source and does NOT accept public contributions.**
+
+**For licensing inquiries, enterprise solutions, or partnership opportunities, please contact our business development team.**
+
+**See `BUSINESS_CONTACT.md` for complete contact information and licensing details.**
 
 ---
 
@@ -273,7 +280,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Website**: [https://xsema.co.uk](https://xsema.co.uk)
 - **Email**: hello@xsema.co.uk
 - **Business**: [Business Contact](BUSINESS_CONTACT.md)
-- **Support**: [GitHub Issues](https://github.com/CaprisUwU/xsema/issues)
+- **Enterprise**: [Enterprise Solutions](BUSINESS_CONTACT.md)
+- **Support**: Enterprise support available for licensed customers
 
 ---
 
@@ -300,3 +308,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **XSEMA - Professional NFT Analytics for the Enterprise Market** 🚀🎯
+
+**Proprietary Commercial Software - All Rights Reserved** © 2025 XSEMA
