@@ -86,6 +86,14 @@ railway up
 
 ## 📚 **Documentation**
 
+### **🚀 Production Deployment**
+- **[Production Deployment Checklist](./docs/PRODUCTION_DEPLOYMENT_CHECKLIST.md)** - Complete production setup guide
+- **[Database Setup Guide](./docs/PRODUCTION_DATABASE_SETUP.md)** - PostgreSQL & Redis configuration
+- **[Environment Variables](./docs/PRODUCTION_ENVIRONMENT.md)** - Production configuration
+- **[Monitoring & Alerting](./docs/PRODUCTION_MONITORING.md)** - Production monitoring system
+- **[Backup & Recovery](./docs/PRODUCTION_BACKUP.md)** - Database backup strategies
+
+### **📖 Core Documentation**
 - **[Phase 4 Completion](./docs/PHASE4_COMPLETION.md)** - Comprehensive Phase 4 overview
 - **[API Endpoints](./docs/PHASE4_API_ENDPOINTS.md)** - Complete API reference
 - **[Authentication](./docs/AUTHENTICATION.md)** - JWT authentication guide
@@ -160,6 +168,24 @@ createdb xsema
 alembic upgrade head
 ```
 
+### **Production Deployment**
+```bash
+# 1. Follow the production deployment checklist
+# See: docs/PRODUCTION_DEPLOYMENT_CHECKLIST.md
+
+# 2. Set up production databases
+# See: docs/PRODUCTION_DATABASE_SETUP.md
+
+# 3. Configure environment variables
+# See: docs/PRODUCTION_ENVIRONMENT.md
+
+# 4. Enable monitoring and alerting
+# See: docs/PRODUCTION_MONITORING.md
+
+# 5. Set up backup and recovery
+# See: docs/PRODUCTION_BACKUP.md
+```
+
 ---
 
 ## 📊 **Performance Metrics**
@@ -169,6 +195,31 @@ alembic upgrade head
 - **Database Connections**: Configurable connection pooling
 - **Cache Hit Rate**: 90%+ with Redis
 - **Security Events**: Real-time monitoring and alerting
+
+---
+
+## 🚀 **Production Deployment**
+
+### **Enterprise-Grade Infrastructure**
+- **Production Database** - PostgreSQL + Redis with connection pooling
+- **Automated Monitoring** - Prometheus metrics + Grafana dashboards
+- **Real-time Alerting** - Discord/Slack integration for critical alerts
+- **Automated Backups** - Daily database backups with S3 storage
+- **Disaster Recovery** - Complete backup and recovery procedures
+
+### **Deployment Options**
+- **Railway (Recommended)** - One-click cloud deployment
+- **Docker** - Containerized deployment
+- **Kubernetes** - Production orchestration
+- **AWS/GCP** - Enterprise cloud deployment
+
+### **Production Checklist**
+- [ ] **Database Setup** - PostgreSQL and Redis configured
+- [ ] **Environment Variables** - Production credentials set
+- [ ] **Monitoring** - Prometheus metrics and alerting
+- [ ] **Backup Strategy** - Automated backup and recovery
+- [ ] **SSL/TLS** - HTTPS certificates configured
+- [ ] **Domain Configuration** - Custom domain setup
 
 ---
 
@@ -194,19 +245,6 @@ alembic upgrade head
 
 ---
 
-## 🤝 **Contributing**
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 **License**
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
