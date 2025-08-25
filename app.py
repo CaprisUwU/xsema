@@ -386,6 +386,62 @@ async def marketplace_status():
             "message": "Failed to retrieve marketplace status"
         }
 
+@app.get("/api/v1/market/real-data")
+async def get_real_market_data():
+    """Get real market data from OpenSea (if API key available)"""
+    logger.info("📊 Real market data requested")
+    
+    try:
+        from core.real_market_data import real_market_service
+        
+        async with real_market_service as service:
+            # Check if we have a valid API key
+            if not os.getenv("OPENSEA_API_KEY") or os.getenv("OPENSEA_API_KEY") in ["test_key_for_now", "your_opensea_api_key", "demo"]:
+                return {
+                    "status": "warning",
+                    "message": "No valid OpenSea API key configured",
+                    "data": {
+                        "market_status": "mock_data",
+                        "collections": [],
+                        "total_volume_24h": 0,
+                        "active_collections": 0,
+                        "last_updated": datetime.now().isoformat()
+                    },
+                    "recommendation": "Set OPENSEA_API_KEY environment variable for real data"
+                }
+            
+            # Try to get real data
+            market_overview = await service.get_market_overview()
+            
+            if market_overview and market_overview.get("active_collections", 0) > 0:
+                return {
+                    "status": "success",
+                    "message": "Real market data retrieved successfully",
+                    "data": market_overview,
+                    "data_source": "opensea"
+                }
+            else:
+                return {
+                    "status": "warning",
+                    "message": "Could not fetch real data, falling back to mock data",
+                    "data": {
+                        "market_status": "mock_data",
+                        "collections": [],
+                        "total_volume_24h": 0,
+                        "active_collections": 0,
+                        "last_updated": datetime.now().isoformat()
+                    },
+                    "recommendation": "Check OpenSea API key and network connectivity"
+                }
+                
+    except Exception as e:
+        logger.error(f"❌ Error getting real market data: {e}")
+        return {
+            "status": "error",
+            "message": "Failed to retrieve market data",
+            "error": str(e)
+        }
+
 @app.get("/api/v1/nft/{contract_address}/{token_id}")
 async def get_nft_data(contract_address: str, token_id: str, network: str = "ethereum"):
     """Get real NFT data from marketplaces"""

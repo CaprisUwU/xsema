@@ -25,20 +25,14 @@ import {
 
 interface ActivityItem {
   id: string;
-  type: 'sale' | 'bid' | 'listing' | 'transfer';
+  type: 'sale' | 'bid' | 'listing' | 'transfer' | 'floor_price_update';
   collection: string;
-  token_id: string;
-  token_name: string;
-  price: number;
-  price_usd: number;
+  collection_name: string;
+  contract_address: string;
+  price: number | null;
   currency: string;
-  from_address: string;
-  to_address: string;
-  transaction_hash: string;
   timestamp: string;
-  marketplace: string;
-  rarity_score?: number;
-  price_change?: number;
+  source: string;
 }
 
 interface CollectionActivity {
@@ -58,94 +52,55 @@ const LiveActivityFeed: React.FC = () => {
   const [isLive, setIsLive] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  // Mock data for demonstration - in production this would come from WebSocket/API
+  // Fetch real data from our market data service
   useEffect(() => {
-    const mockActivities: ActivityItem[] = [
-      {
-        id: '1',
-        type: 'sale',
-        collection: '0x1234...',
-        token_id: '1234',
-        token_name: 'Bored Ape #1234',
-        price: 25.5,
-        price_usd: 51000,
-        currency: 'ETH',
-        from_address: '0xabcd...',
-        to_address: '0xefgh...',
-        transaction_hash: '0x1234...',
-        timestamp: new Date().toISOString(),
-        marketplace: 'OpenSea',
-        rarity_score: 95.2,
-        price_change: 12.5
-      },
-      {
-        id: '2',
-        type: 'bid',
-        collection: '0x5678...',
-        token_id: '5678',
-        token_name: 'Doodle #5678',
-        price: 8.2,
-        price_usd: 16400,
-        currency: 'ETH',
-        from_address: '0xijkl...',
-        to_address: '0xmnop...',
-        transaction_hash: '0x5678...',
-        timestamp: new Date(Date.now() - 30000).toISOString(),
-        marketplace: 'Blur',
-        rarity_score: 87.3,
-        price_change: -2.1
-      },
-      {
-        id: '3',
-        type: 'listing',
-        collection: '0x9abc...',
-        token_id: '9abc',
-        token_name: 'Azuki #9abc',
-        price: 12.8,
-        price_usd: 25600,
-        currency: 'ETH',
-        from_address: '0xqrst...',
-        to_address: '',
-        transaction_hash: '0x9abc...',
-        timestamp: new Date(Date.now() - 60000).toISOString(),
-        marketplace: 'OpenSea',
-        rarity_score: 92.1,
-        price_change: 0
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Import the market data service dynamically to avoid circular dependencies
+        const { default: marketDataService } = await import('../../utils/marketDataService');
+        
+        // Fetch live activity
+        const liveActivities = await marketDataService.getLiveActivity(10);
+        setActivities(liveActivities);
+        
+        // For now, we'll use the activities to create collection summaries
+        // In the future, this could be enhanced with real collection data
+        if (liveActivities.length > 0) {
+          const collectionMap = new Map<string, CollectionActivity>();
+          
+          liveActivities.forEach(activity => {
+            if (!collectionMap.has(activity.collection)) {
+              collectionMap.set(activity.collection, {
+                collection: activity.collection,
+                collection_name: activity.collection_name,
+                floor_price: activity.price || 0,
+                floor_change_24h: 0, // Would need historical data for this
+                volume_24h: 0, // Would need volume data for this
+                sales_count_24h: 1,
+                recent_activities: [activity]
+              });
+            } else {
+              const existing = collectionMap.get(activity.collection)!;
+              existing.recent_activities.push(activity);
+              existing.sales_count_24h += 1;
+            }
+          });
+          
+          setCollections(Array.from(collectionMap.values()));
+        }
+      } catch (error) {
+        console.error('Error fetching live activity:', error);
+        // Fall back to mock data if real data fails
+        setActivities([]);
+        setCollections([]);
+      } finally {
+        setLoading(false);
       }
-    ];
+    };
 
-    const mockCollections: CollectionActivity[] = [
-      {
-        collection: '0x1234...',
-        collection_name: 'Bored Ape Yacht Club',
-        floor_price: 25.5,
-        floor_change_24h: 12.5,
-        volume_24h: 1250.5,
-        sales_count_24h: 45,
-        recent_activities: mockActivities.filter(a => a.collection === '0x1234...')
-      },
-      {
-        collection: '0x5678...',
-        collection_name: 'Doodles',
-        floor_price: 8.2,
-        floor_change_24h: -2.1,
-        volume_24h: 450.2,
-        sales_count_24h: 23,
-        recent_activities: mockActivities.filter(a => a.collection === '0x5678...')
-      },
-      {
-        collection: '0x9abc...',
-        collection_name: 'Azuki',
-        floor_price: 12.8,
-        floor_change_24h: 0,
-        volume_24h: 890.7,
-        sales_count_24h: 34,
-        recent_activities: mockActivities.filter(a => a.collection === '0x9abc...')
-      }
-    ];
-
-    setActivities(mockActivities);
-    setCollections(mockCollections);
+    fetchData();
   }, []);
 
   const getActivityIcon = (type: string) => {
@@ -272,42 +227,32 @@ const LiveActivityFeed: React.FC = () => {
                     <div className="flex items-center space-x-3">
                       <div>
                         <h4 className="text-sm font-medium text-slate-900 dark:text-white">
-                          {activity.token_name}
+                          {activity.collection_name}
                         </h4>
                         <p className="text-xs text-slate-600 dark:text-slate-400">
-                          {activity.collection_name || activity.collection}
+                          {activity.contract_address.slice(0, 8)}...
                         </p>
                       </div>
-                      {activity.rarity_score && (
-                        <div className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 rounded text-xs font-medium text-blue-700 dark:text-blue-400">
-                          Rarity: {activity.rarity_score}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-medium text-slate-900 dark:text-white">
-                          {activity.price} {activity.currency}
-                        </span>
-                        <span className="text-xs text-slate-600 dark:text-slate-400">
-                          (£{(activity.price_usd * 0.79).toFixed(2)})
-                        </span>
+                      <div className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 rounded text-xs font-medium text-blue-700 dark:text-blue-400">
+                        {activity.type}
                       </div>
-                      {activity.price_change !== undefined && (
-                        <span className={`text-xs font-medium ${getPriceChangeColor(activity.price_change)}`}>
-                          {activity.price_change > 0 ? '+' : ''}{activity.price_change}%
-                        </span>
-                      )}
                     </div>
+                                          <div className="text-right">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium text-slate-900 dark:text-white">
+                            {activity.price ? `${activity.price} ${activity.currency}` : 'N/A'}
+                          </span>
+                          <span className="text-xs text-slate-600 dark:text-slate-400">
+                            {activity.price ? `(£${(activity.price * 2000).toFixed(2)})` : ''}
+                          </span>
+                        </div>
+                      </div>
                   </div>
 
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center space-x-4 text-xs text-slate-600 dark:text-slate-400">
-                      <span>From: {formatAddress(activity.from_address)}</span>
-                      {activity.to_address && (
-                        <span>To: {formatAddress(activity.to_address)}</span>
-                      )}
-                      <span>{activity.marketplace}</span>
+                      <span>Collection: {activity.collection}</span>
+                      <span>Source: {activity.source}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-xs text-slate-500">
                       <Clock className="w-3 h-3" />

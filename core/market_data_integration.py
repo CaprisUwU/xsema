@@ -398,22 +398,32 @@ class MarketDataManager:
         if self.configs[Marketplace.OPENSEA].enabled and network in self.configs[Marketplace.OPENSEA].supported_networks:
             if self._check_rate_limit(Marketplace.OPENSEA):
                 try:
-                    url = f"{self.configs[Marketplace.OPENSEA].api_url}/chain/{network}/contract/{contract_address}"
+                    # Use the correct OpenSea API endpoint for collections
+                    url = f"{self.configs[Marketplace.OPENSEA].api_url}/collection/{contract_address}"
                     
-                    async with self.session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as response:
+                    headers = {}
+                    if self.configs[Marketplace.OPENSEA].api_key:
+                        headers["X-API-KEY"] = self.configs[Marketplace.OPENSEA].api_key
+                    
+                    async with self.session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=15)) as response:
                         if response.status == 200:
                             data = await response.json()
+                            collection = data.get("collection", {})
+                            stats = collection.get("stats", {})
+                            
                             return {
-                                "name": data.get("name"),
-                                "description": data.get("description"),
-                                "image_url": data.get("image_url"),
-                                "external_url": data.get("external_url"),
-                                "verified": data.get("verified", False),
-                                "floor_price": data.get("floor_price"),
-                                "total_supply": data.get("total_supply"),
-                                "owners_count": data.get("owners_count"),
+                                "name": collection.get("name"),
+                                "description": collection.get("description"),
+                                "image_url": collection.get("image_url"),
+                                "external_url": collection.get("external_url"),
+                                "verified": collection.get("verified", False),
+                                "floor_price": stats.get("floor_price"),
+                                "total_supply": stats.get("total_supply"),
+                                "owners_count": stats.get("num_owners"),
                                 "data_source": "opensea"
                             }
+                        else:
+                            logger.warning(f"OpenSea API returned {response.status} for collection {contract_address}")
                 except Exception as e:
                     logger.warning(f"OpenSea collection fetch failed: {e}")
         
