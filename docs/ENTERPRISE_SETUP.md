@@ -179,7 +179,7 @@ Configure your IdP (Okta, Azure AD, etc.):
 
 #### **2. XSEMA SAML Configuration**
 ```bash
-curl -X POST "http://localhost:8001/api/v1/saml/configure" \
+curl -X POST "http://localhost:8000/api/v1/saml/configure" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -d '{
@@ -203,7 +203,7 @@ Configure your OAuth provider (Google, Microsoft, etc.):
 
 #### **2. XSEMA OAuth Configuration**
 ```bash
-curl -X POST "http://localhost:8001/api/v1/oauth/clients" \
+curl -X POST "http://localhost:8000/api/v1/oauth/clients" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -d '{
@@ -218,7 +218,7 @@ curl -X POST "http://localhost:8001/api/v1/oauth/clients" \
 
 #### **1. LDAP Configuration**
 ```bash
-curl -X POST "http://localhost:8001/api/v1/enterprise/ldap/configure" \
+curl -X POST "http://localhost:8000/api/v1/enterprise/ldap/configure" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
   -d '{
@@ -274,11 +274,11 @@ is_valid = enterprise_service.verify_mfa_token(user_id, token)
 #### **View Audit Logs**
 ```bash
 # Get user audit logs
-curl "http://localhost:8001/api/v1/enterprise/audit/logs?user_id=user_123" \
+curl "http://localhost:8000/api/v1/enterprise/audit/logs?user_id=user_123" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
 
 # Get system audit logs
-curl "http://localhost:8001/api/v1/enterprise/audit/logs?action=user_created" \
+curl "http://localhost:8000/api/v1/enterprise/audit/logs?action=user_created" \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
 ```
 
@@ -319,19 +319,19 @@ echo $DATABASE_URL
 #### **2. SAML Configuration Issues**
 ```bash
 # Test SAML metadata
-curl "http://localhost:8001/saml/metadata"
+curl "http://localhost:8000/saml/metadata"
 
 # Check SAML status
-curl "http://localhost:8001/api/v1/saml/status"
+curl "http://localhost:8000/api/v1/saml/status"
 ```
 
 #### **3. OAuth Issues**
 ```bash
 # Test OAuth discovery
-curl "http://localhost:8001/.well-known/oauth-authorization-server"
+curl "http://localhost:8000/.well-known/oauth-authorization-server"
 
 # Check OAuth client status
-curl "http://localhost:8001/api/v1/oauth/clients"
+curl "http://localhost:8000/api/v1/oauth/clients"
 ```
 
 #### **4. LDAP Connection Issues**

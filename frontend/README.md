@@ -76,7 +76,7 @@ npm run preview
 Create a `.env.local` file in the frontend directory:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8001
+VITE_API_BASE_URL=http://localhost:8000
 VITE_APP_NAME=XSEMA
 VITE_APP_VERSION=2.0.0
 VITE_ENVIRONMENT=development
@@ -134,7 +134,7 @@ const currentTime = format(new Date(), 'HH:mm', { locale: enGB });
 
 The frontend integrates with the XSEMA backend API:
 
-- **Base URL**: `http://localhost:8001` (development)
+- **Base URL**: `http://localhost:8000` (development)
 - **Authentication**: API key-based authentication
 - **Real-time Updates**: WebSocket connections
 - **Data Caching**: React Query for efficient data management

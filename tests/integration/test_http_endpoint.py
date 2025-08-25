@@ -5,7 +5,7 @@ import requests
 import sys
 
 def test_http_endpoint():
-    url = "http://localhost:8001/health"
+    url = "http://localhost:8000/health"
     print(f"Testing HTTP endpoint: {url}")
     print("-" * 60)
     

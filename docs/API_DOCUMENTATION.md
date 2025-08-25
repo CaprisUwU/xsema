@@ -5,7 +5,7 @@
 
 XSEMA (Advanced NFT Security & Analytics Platform) provides a comprehensive API for NFT analytics, security analysis, and portfolio management across multiple blockchain networks.
 
-**Base URL**: `http://localhost:8001` (Development)  
+**Base URL**: `http://localhost:8000` (Development)  
 **Production URL**: TBD  
 **API Version**: v2.0.0  
 **Authentication**: API Key required for most endpoints
@@ -14,17 +14,17 @@ XSEMA (Advanced NFT Security & Analytics Platform) provides a comprehensive API 
 
 ### 1. Health Check
 ```bash
-curl http://localhost:8001/health
+curl http://localhost:8000/health
 ```
 
 ### 2. API Information
 ```bash
-curl http://localhost:8001/
+curl http://localhost:8000/
 ```
 
 ### 3. API Documentation (Swagger UI)
 ```
-http://localhost:8001/docs
+http://localhost:8000/docs
 ```
 
 ## Authentication
@@ -32,7 +32,7 @@ http://localhost:8001/docs
 Most endpoints require an API key. Include it in the header:
 
 ```bash
-curl -H "X-API-Key: your-api-key" http://localhost:8001/api/v1/portfolio/portfolios
+curl -H "X-API-Key: your-api-key" http://localhost:8000/api/v1/portfolio/portfolios
 ```
 
 ## Core Endpoints
@@ -350,7 +350,7 @@ GET /api/v1/traits/rarity/{collection_id}
 
 ### Connection
 ```javascript
-const ws = new WebSocket('ws://localhost:8001/ws');
+const ws = new WebSocket('ws://localhost:8000/ws');
 ```
 
 ### Subscribe to Events
@@ -417,7 +417,7 @@ headers = {"X-API-Key": api_key}
 
 # Get portfolio
 response = requests.get(
-    "http://localhost:8001/api/v1/portfolio/portfolios",
+    "http://localhost:8000/api/v1/portfolio/portfolios",
     headers=headers
 )
 portfolios = response.json()
@@ -428,7 +428,7 @@ portfolios = response.json()
 const axios = require('axios');
 
 const api = axios.create({
-  baseURL: 'http://localhost:8001',
+  baseURL: 'http://localhost:8000',
   headers: {
     'X-API-Key': 'your-api-key'
   }
@@ -442,18 +442,18 @@ const portfolios = await api.get('/api/v1/portfolio/portfolios');
 ```bash
 # Get all portfolios
 curl -H "X-API-Key: your-api-key" \
-  http://localhost:8001/api/v1/portfolio/portfolios
+  http://localhost:8000/api/v1/portfolio/portfolios
 
 # Create portfolio
 curl -X POST \
   -H "X-API-Key: your-api-key" \
   -H "Content-Type: application/json" \
   -d '{"name":"My Portfolio"}' \
-  http://localhost:8001/api/v1/portfolio/portfolios
+  http://localhost:8000/api/v1/portfolio/portfolios
 
 # Analyze wallet
 curl -H "X-API-Key: your-api-key" \
-  http://localhost:8001/api/v1/wallet-analysis/cluster/0x1234...
+  http://localhost:8000/api/v1/wallet-analysis/cluster/0x1234...
 ```
 
 ## Best Practices

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8001/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
 
 /**
  * Get floor price for a specific collection
@@ -106,7 +106,7 @@ export const getCollections = async (page = 1, limit = 20, sortBy = 'floor_price
  * @returns {WebSocket} WebSocket connection
  */
 export const subscribeToFloorPrices = (onUpdate, collections = []) => {
-  const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:8001/ws';
+  const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:8000/ws';
   const ws = new WebSocket(wsUrl);
 
   ws.onopen = () => {

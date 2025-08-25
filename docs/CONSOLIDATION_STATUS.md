@@ -188,8 +188,8 @@ The consolidation has been **highly successful**. We've:
 
 ## Resources
 
-- **API Documentation**: http://localhost:8001/docs
-- **Health Check**: http://localhost:8001/health  
+- **API Documentation**: http://localhost:8000/docs
+- **Health Check**: http://localhost:8000/health  
 - **Consolidation Details**: [CONSOLIDATION.md](./CONSOLIDATION.md)
 - **Phase Reorganization**: [PHASE_REORGANIZATION.md](./PHASE_REORGANIZATION.md)
 - **Original Roadmap**: [ROADMAP.md](./ROADMAP.md)

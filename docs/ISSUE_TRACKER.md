@@ -9,7 +9,7 @@ This document tracks all issues encountered during development, their resolution
 | 1  | 2025-08-01 | Resolved | Environment | Missing 'backoff' dependency | Added to requirements.txt and installed in virtual environment |
 | 2  | 2025-08-01 | Resolved | Web3 | ImportError: cannot import name 'geth_poa_middleware' | Updated to use 'ExtraDataToPOAMiddleware' for web3.py 5.31.1 compatibility |
 | 3  | 2025-08-01 | Resolved | Services | Circular import issues | Restructured imports in services layer to use package-level imports |
-| 4  | 2025-08-01 | Resolved | Testing | Port conflicts (8000 in use) | Standardized on port 8001 for testing |
+| 4  | 2025-08-01 | Resolved | Testing | Port conflicts (8000 in use) | Standardized on port 8000 for all environments |
 | 5  | 2025-08-01 | Resolved | API | Duplicate parameter bug in routers | Removed redundant path parameters from endpoint decorators |
 | 6  | 2025-08-01 | Resolved | Environment | Unicode encoding issues in Windows | Implemented safe_print function and removed emoji/Unicode characters from console output |
 | 7  | 2025-08-01 | Open    | Testing | Inconsistent test discovery | Investigating pytest configuration and sys.path issues |

@@ -51,7 +51,7 @@ The NFT Analytics Engine project consolidation has been **successfully completed
 ## 🎯 **CURRENT WORKING STATUS**
 
 ### **🟢 FULLY OPERATIONAL**
-- ✅ **FastAPI Server**: Running stable on port 8001
+- ✅ **FastAPI Server**: Running stable on port 8000
 - ✅ **Health Endpoint**: 200 OK
 - ✅ **NFT Analytics**: Core endpoints working
 - ✅ **Wallet Analysis**: Functional
