@@ -63,7 +63,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements-security-fixed.txt
-        pip install bandit safety
+        pip install bandit pip-audit
     
     - name: Run Bandit security scan (non-blocking)
       run: |
@@ -71,11 +71,11 @@ jobs:
         bandit -r . -c .bandit -f json -o bandit-report.json || echo "Bandit scan completed with warnings"
         echo "Bandit scan completed"
     
-    - name: Run Safety dependency check (non-blocking)
+    - name: Run pip-audit dependency check (non-blocking)
       run: |
-        echo "Running Safety dependency check..."
-        safety scan --output safety-report.txt || echo "Safety check completed with warnings"
-        echo "Safety check completed"
+        echo "Running pip-audit dependency check..."
+        pip-audit --output pip-audit-report.txt || echo "pip-audit completed with warnings"
+        echo "pip-audit check completed"
     
     - name: Basic security validation (always pass)
       run: |

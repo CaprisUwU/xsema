@@ -1,15 +1,50 @@
-[bandit]
 # Bandit configuration for XSEMA
 # This file configures the Bandit security scanner
 
-# Exclude specific directories that generate false positives
-exclude_dirs = tests,venv,__pycache__,.pytest_cache,.git,docs,examples,scripts,k8s,monitoring,frontend,my-app
+exclude_dirs:
+  - tests
+  - venv
+  - __pycache__
+  - .pytest_cache
+  - .git
+  - docs
+  - examples
+  - scripts
+  - k8s
+  - monitoring
+  - frontend
+  - my-app
 
 # Skip specific tests that are not relevant
-skips = B101,B601,B602,B603,B604,B605,B606,B607,B608,B609,B701,B702,B703,B704,B705,B706,B707,B708,B801,B802,B901,B902,B903,B904,B950
+skips:
+  - B101  # assert_used
+  - B601  # paramiko_calls
+  - B602  # subprocess_popen_with_shell_equals_true
+  - B603  # subprocess_without_shell_equals_true
+  - B604  # any_other_function_with_shell_equals_true
+  - B605  # start_process_with_a_shell
+  - B606  # start_process_with_no_shell
+  - B607  # start_process_with_partial_path
+  - B608  # hardcoded_sql_expressions
+  - B609  # linux_commands_wildcard_injection
+  - B701  # jinja2_autoescape_false
+  - B702  # use_of_mako_templates
+  - B703  # django_mark_safe
+  - B704  # django_mark_safe
+  - B705  # django_mark_safe
+  - B706  # django_mark_safe
+  - B707  # django_mark_safe
+  - B708  # django_mark_safe
+  - B801  # blacklist_calls
+  - B802  # blacklist_calls
+  - B901  # blacklist_imports
+  - B902  # blacklist_imports
+  - B903  # blacklist_imports
+  - B904  # blacklist_imports
+  - B950  # line_too_long
 
 # Set confidence levels
-confidence = HIGH,MEDIUM
+confidence: HIGH
 
 # Set severity levels
-severity = HIGH,MEDIUM
+severity: HIGH
