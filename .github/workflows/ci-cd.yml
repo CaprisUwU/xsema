@@ -33,7 +33,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r requirements-security-fixed.txt
         pip install pytest pytest-asyncio pytest-cov fastapi[all]
     
     - name: Run tests with error handling
@@ -62,26 +62,19 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r requirements-security-fixed.txt
+        pip install bandit safety
     
     - name: Run Bandit security scan (non-blocking)
       run: |
         echo "Running Bandit security scan..."
-        if command -v bandit &> /dev/null; then
-          bandit -r . --exclude-dir=venv,__pycache__,.pytest_cache,tests,docs,examples,scripts,k8s,monitoring,frontend,my-app -f json -o bandit-report.json || echo "Bandit scan completed with warnings"
-        else
-          echo "Bandit not available, skipping scan"
-        fi
+        bandit -r . -c .bandit -f json -o bandit-report.json || echo "Bandit scan completed with warnings"
         echo "Bandit scan completed"
     
     - name: Run Safety dependency check (non-blocking)
       run: |
         echo "Running Safety dependency check..."
-        if command -v safety &> /dev/null; then
-          safety check --output safety-report.txt || echo "Safety check completed with warnings"
-        else
-          echo "Safety not available, skipping check"
-        fi
+        safety scan --output safety-report.txt || echo "Safety check completed with warnings"
         echo "Safety check completed"
     
     - name: Basic security validation (always pass)
@@ -106,7 +99,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r requirements-security-fixed.txt
     
     - name: Test application startup
       run: |
@@ -169,7 +162,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install -r requirements.txt
+        pip install -r requirements-security-fixed.txt
     
     - name: Test network connectivity
       run: |
