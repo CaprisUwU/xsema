@@ -82,7 +82,7 @@ jobs:
         fi
     
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
@@ -119,7 +119,7 @@ jobs:
         pip-audit --requirement requirements-security-fixed.txt --output pip-audit-requirements.txt
     
     - name: Upload audit reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dependency-audit-reports
         path: |
