@@ -1,0 +1,49 @@
+# XSEMA Security-Fixed Requirements
+# This file contains updated versions that fix all identified security vulnerabilities
+
+# Core FastAPI dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Pydantic and configuration - Updated to fix vulnerabilities
+pydantic==2.9.2
+pydantic-settings==2.1.0
+
+# Authentication and security - Updated versions
+PyJWT==2.10.1  # Fixed CVE-2024-53861
+bcrypt==4.1.2
+email-validator==2.1.0
+
+# HTTP and networking - Updated to fix vulnerabilities
+aiohttp==3.12.14  # Already secure
+requests==2.32.4  # Fixed CVE-2024-47081
+
+# Database dependencies
+asyncpg==0.29.0
+redis==5.0.1
+sqlalchemy==2.0.23
+
+# WebSocket support
+websockets==12.0
+
+# Utilities
+python-dotenv==1.0.0
+python-multipart==0.0.6
+
+# Security - Updated versions
+jinja2==3.1.6
+setuptools==78.1.1
+certifi==2025.8.3
+urllib3==2.2.0
+
+# Fixed vulnerable dependencies
+starlette==0.47.2  # Fixed CVE-2025-54121
+anyio==4.4.0  # Fixed PVE-2024-71199
+
+# Remove vulnerable packages that are not essential
+# python-jose - Removed due to multiple CVEs (CVE-2024-33664, CVE-2024-33663)
+# ecdsa - Removed due to CVEs (CVE-2024-23342, PVE-2024-64396)
+
+# Alternative JWT handling (if needed, use PyJWT instead of python-jose)
+# For ECDSA functionality, use cryptography library instead of ecdsa
+cryptography==45.0.5
